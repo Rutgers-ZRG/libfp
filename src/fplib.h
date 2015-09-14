@@ -14,3 +14,6 @@ extern void dsyev( char* jobz, char* uplo, int* n, double* a, int* lda,
 
 int get_fp(Cell * cell, int ixyz, int nx, int lseg, int l, double cutoff);
 
+void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_sphere[], 
+        double amp[], double *om[]);
+
