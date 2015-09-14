@@ -15,7 +15,7 @@ typedef struct {
     char **symb;
 } Cell;
 
-Cell c_new_cell(int n);
+Cell c_new_cell(int n, int ntyp, int nx, int lseg, int l);
 void c_del_cell(Cell * cell);
-void c_set_cell(Cell * cell, double lat[3][3], double rxyz[][3], int types[]);
+void c_set_cell(Cell * cell, double lat[3][3], double rxyz[][3], int types[], char *symb[]);
 

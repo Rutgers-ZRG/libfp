@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "cell.h"
-#include "mathfunc.h"
+#include "rcov.h"
 
 Cell c_new_cell(int n, int ntyp, int nx, int lseg, int l) {
     int i;
     Cell cell;
     cell.n = n;
     cell.ntyp = ntyp;
-    if ((cell.types = (int *) malloc(sizeof(int) * size)) == NULL) {
+    if ((cell.types = (int *) malloc(sizeof(int) * n)) == NULL) {
         fprintf(stderr, "Memory could not be allocated.");
         exit(1);
     }
@@ -63,17 +63,18 @@ void c_del_cell(Cell * cell) {
 }
 
 void c_set_cell(Cell * cell, double lat[3][3], double rxyz[][3], int types[], 
-        char *symb[], double e = 0) {
+        char *symb[]) {
     int i, j;
 
-    cell->e = e;
-    cpmat3(cell->lat, lat);
+    for (i = 0; i < 3; i++)
+        for (j = 0; j < 3; j++)
+            cell->lat[i][j] = lat[i][j];
     for (i = 0; i < cell->n; i++) {
         for (j = 0; j < 3; j++) {
             cell->rxyz[i][j] = rxyz[i][j];
         }
         cell->types[i] = types[i];
-        cell->rocv[i] = get_rcov( symb[types[i]] );
+        cell->rcov[i] = get_rcov( symb[types[i]] );
     }
 
     for ( i = 0; i < cell->ntyp; i++) {

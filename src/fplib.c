@@ -6,17 +6,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "fplib.h"
-#include "cell.h"
+#include "rcov.h"
 
-extern void dsyev( char* jobz, char* uplo, int* n, double* a, int* lda,
-                double* w, double* work, int* lwork, int* info );
-
-int get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
+void get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
         double rxyz[][3], char *symb[], int natx, char *orb, double cutoff,
-        double sfp[][], double lfp[][], double e=0.0)
+        double *sfp[], double *lfp[])
 {
-    int iat, jat, ix, iy, iz, i, j, k;
+    int iat, jat, ix, iy, iz, i, j, k, ixyz;
     int n, lda, info, lwork;
     double wkopt;
     double* work;
@@ -31,10 +29,10 @@ int get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
     int lseg, l;
 
     
-    if (strcmp(s, "s") == 0){
+    if (strcmp(orb, "s") == 0){
         lseg = 1;
         l = 1;
-    }else if (strcmp(s, "sp") == 0){
+    }else if (strcmp(orb, "sp") == 0){
         lseg = 4;
         l = 2;
     }else {
@@ -44,7 +42,7 @@ int get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
 
 
     cell = c_new_cell(nat, ntyp, natx, lseg, l);
-    c_set_cell(&cell, lat, rxyz, types, symb, e);
+    c_set_cell(&cell, lat, rxyz, types, symb);
 
     n = 3;
     lda = n;
@@ -54,7 +52,7 @@ int get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
   
     for (i=0; i < 3; i++) 
         for (j=0; j < 3; j++) 
-            lat2[i][j] = lat[i][0]*lat[j][0] + lat[i][1]*lat[j][1] + lat[i][3]*lat[j][3];
+            lat2[i][j] = lat[i][0]*lat[j][0] + lat[i][1]*lat[j][1] + lat[i][2]*lat[j][2];
 
     for (i = 0; i < 3; i++)
         for (j = 0; j < 3; j++)
@@ -69,7 +67,7 @@ int get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
          exit(1);
     }
    
-    ixyz = (int)(sqrt(1.0/w[0])*cutoff + 1)
+    ixyz = (int)(sqrt(1.0/w[0])*cutoff + 1);
 
     free(w);
     free(a);
@@ -77,7 +75,11 @@ int get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
 
     // get sphere info
     
-    info = get_fp(&cell, ixyz, cutoff);
+    info = get_fp(&cell, ixyz, natx, lseg, l, cutoff);
+
+    for (i = 0; i < natx; i++)
+        lfp[i][j] = cell.lfp[i][j];
+    c_del_cell(&cell); 
 
 }
  
@@ -87,10 +89,11 @@ int get_fp(Cell * cell, int ixyz, int nx, int lseg, int l, double cutoff){
     int n_sphere_min = 1000000; 
     int n_sphere_max = 0;
     int ind[nx];
-    double xi, yi, zi, xj, yj, zj, il;
+    double xi, yi, zi, xj, yj, zj, d2;
     double cutoff2 = cutoff*cutoff;
     double rxyz_sphere[nx][3];
     double rcov_sphere[nx];
+    double amp[nx];
     double fc, wc;
 
     double **om, **om_save;
@@ -139,9 +142,9 @@ int get_fp(Cell * cell, int ixyz, int nx, int lseg, int l, double cutoff){
                             }
                             for (il = 0; il < lseg; il++) {
                                 if (il == 0){
-                                    ind[il+lseg*(nat_sphere-1)] = ityp_sphere*il + 1;
+                                    ind[il+lseg*(n_sphere-1)] = ityp_sphere*il + 1;
                                 } else {
-                                    ind[il+lseg*(nat_sphere-1)] = ityp_sphere*il + 2;
+                                    ind[il+lseg*(n_sphere-1)] = ityp_sphere*il + 2;
                                 }
                             }
 
@@ -157,29 +160,29 @@ int get_fp(Cell * cell, int ixyz, int nx, int lseg, int l, double cutoff){
 
         // big overlap matrix
 
-        nid = lseg*nat_sphere;
+        nid = lseg * n_sphere;
 
         if ( (om = (double **) malloc(sizeof(double)*nid)) == NULL) {
-            printf(stderr, "Memory could not be allocated.");
+            fprintf(stderr, "Memory could not be allocated.");
             exit(1);
         }
         for (i = 0; i < nid; i++){
             if ( (om[i] = (double *) malloc(sizeof(double)*nid)) == NULL) {
-                printf(stderr, "Memory could not be allocated.");
+                fprintf(stderr, "Memory could not be allocated.");
                 exit(1);
             }
         }
         
         if ( (om_save = (double **) malloc(sizeof(double)*nid)) == NULL) {
-            printf(stderr, "Memory could not be allocated.");
+            fprintf(stderr, "Memory could not be allocated.");
             exit(1); }
         for ( i = 0; i < nid; i++ ) {
             if ( (om_save[i] = (double *) malloc(sizeof(double)*nid)) == NULL ) {
-                printf(stderr, "Memory could not be allocated.");
+                fprintf(stderr, "Memory could not be allocated.");
                 exit(1); } }
 
 
-        creat_om( lseg, n_sphere, rxyz_sphere, rcov_sphere, amp, &om );
+        //creat_om( lseg, n_sphere, rxyz_sphere, rcov_sphere, amp, &om );
 
 
         for (i = 0; i < nid; i++){
@@ -189,11 +192,11 @@ int get_fp(Cell * cell, int ixyz, int nx, int lseg, int l, double cutoff){
         }
 
         if ( (a = (double *) malloc(sizeof(double)*nid*nid)) == NULL) {
-            printf(stderr, "Memory could not be allocated.");
+            fprintf(stderr, "Memory could not be allocated.");
             exit(1);}
         
         if ( (w = (double *) malloc(sizeof(double)*nid)) == NULL) {
-           printf(stderr, "Memory could not be allocated.");
+           fprintf(stderr, "Memory could not be allocated.");
            exit(1);}
 
         for (i = 0; i < nid; i++) 
@@ -223,7 +226,12 @@ int get_fp(Cell * cell, int ixyz, int nx, int lseg, int l, double cutoff){
 
 
         // contract
-
+        free(w);
+        free(work);
+        free(a);
+        free(om);
+        free(om_save);
         
     }
+    return 0;
 }
