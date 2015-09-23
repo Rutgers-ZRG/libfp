@@ -60,9 +60,9 @@ double get_rcov(char * s) {
     else if (strcmp(s, "Sn") == 0)  rcov = 0.75;
     else if (strcmp(s, "Sb") == 0)  rcov = 0.75;
     else if (strcmp(s, "Te") == 0)  rcov = 0.75;
-    else if (strcmp(s, "I" ) == 0)  rcov = 0.75;
+    else if (strcmp(s, "I" ) == 0)  rcov = 1.33;
     else if (strcmp(s, "Xe") == 0)  rcov = 0.75;
-    else if (strcmp(s, "Cs") == 0)  rcov = 0.75;
+    else if (strcmp(s, "Cs") == 0)  rcov = 2.25;
     else if (strcmp(s, "Ba") == 0)  rcov = 0.75;
     else if (strcmp(s, "La") == 0)  rcov = 0.75;
     else if (strcmp(s, "Ce") == 0)  rcov = 0.75;
@@ -89,7 +89,7 @@ double get_rcov(char * s) {
     else if (strcmp(s, "Au") == 0)  rcov = 0.75;
     else if (strcmp(s, "Hg") == 0)  rcov = 0.75;
     else if (strcmp(s, "Tl") == 0)  rcov = 0.75;
-    else if (strcmp(s, "Pb") == 0)  rcov = 0.75;
+    else if (strcmp(s, "Pb") == 0)  rcov = 1.47;
     else if (strcmp(s, "Bi") == 0)  rcov = 0.75;
     else if (strcmp(s, "Po") == 0)  rcov = 0.75;
     else if (strcmp(s, "At") == 0)  rcov = 0.75;
@@ -122,5 +122,5 @@ double get_rcov(char * s) {
     else if (strcmp(s, "Cn") == 0)  rcov = 0.75;
     else rcov = 1.0;
 
-    return rcov;
+    return rcov /  0.52917720859;
 }
