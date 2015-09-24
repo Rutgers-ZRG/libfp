@@ -181,23 +181,9 @@ int get_fp(int nat, int ixyz, int nx, int lseg, int l, double lat[3][3],
             }
         }
 
-        //if ( (om_save = (double **) malloc(sizeof(double)*nid)) == NULL) {
-        //    fprintf(stderr, "Memory could not be allocated.");
-        //    exit(1); }
-        //for ( i = 0; i < nid; i++ ) {
-        //    if ( (om_save[i] = (double *) malloc(sizeof(double)*nid)) == NULL ) {
-        //        fprintf(stderr, "Memory could not be allocated.");
-        //        exit(1); } }
-
 
         creat_om( lseg, n_sphere, rxyz_sphere, rcov_sphere, amp, om );
 
-
-        //for (i = 0; i < nid; i++){
-        //    for (j = 0; j < nid; j++){
-        //        om_save[i][j] = om[i][j];
-        //    }
-        //}
 
         if ( (a = (double *) malloc(sizeof(double)*nid*nid)) == NULL) {
             fprintf(stderr, "Memory could not be allocated.");
@@ -237,10 +223,10 @@ int get_fp(int nat, int ixyz, int nx, int lseg, int l, double lat[3][3],
         for (i = nid; i < nx; i++)
             lfp[iat][i] = 0.0;
 
-        printf("%d, ", iat);
-        for (i = 0; i < nx; i++)
-            printf("  %g  ", lfp[iat][i]);
-        printf("\n");
+        // printf("%d, ", iat);
+        // for (i = 0; i < nx; i++)
+        //     printf("  %g  ", lfp[iat][i]);
+        // printf("\n");
 
         // contract
 
@@ -264,8 +250,6 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
     int iat, jat, i, j, ii, jj;
     double xi, yi, zi, xj, yj, zj, xji, yji, zji;
     double d2, r, sji, stv;
-    //double om4[n_sphere][lseg][n_sphere][lseg];
-
 
     if (lseg == 1) {
         for (iat = 0; iat < n_sphere; iat++) {
@@ -298,44 +282,23 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
                 zji = zj - zi;
                 d2 = xji*xji + yji*yji+zji*zji;
                 r = 0.5/(rcov_sphere[iat]*rcov_sphere[iat] + rcov_sphere[jat]*rcov_sphere[jat]);
-                // <sj|si>
-                //om4[iat][0][jat][0] = pow(sqrt(4.0 * r * (rcov_sphere[iat]*rcov_sphere[jat])), 3)
-                //printf("%g %g %g %g %g %g %g\n", r, 4.0 * r * (rcov_sphere[iat]*rcov_sphere[jat]), 
-                //        sqrt(4.0 * r * (rcov_sphere[iat]*rcov_sphere[jat])), -d2*r,
-                //     exp(-d2 * r), amp[iat], amp[jat]);
                 om[4*iat][4*jat] = pow(sqrt(4.0 * r * (rcov_sphere[iat]*rcov_sphere[jat])), 3)
                         * exp(-d2 * r) * amp[iat] * amp[jat];
-                printf("w %g \n", om[4*iat][4*jat]);
+                
                 // <pj|si>
                 sji = pow(sqrt(4.0*r*rcov_sphere[iat]*rcov_sphere[jat]), 3) * exp(-d2 * r);
                 stv = sqrt(8.0) * rcov_sphere[jat] * r * sji;
-                //om4[iat][0][jat][1] = stv * xji * amp[iat] * amp[jat];
                 om[4*iat][4*jat+1] = stv * xji * amp[iat] * amp[jat];
-                //om4[iat][0][jat][2] = stv * yji * amp[iat] * amp[jat];
                 om[4*iat][4*jat+2] = stv * yji * amp[iat] * amp[jat];
-                //om4[iat][0][jat][3] = stv * zji * amp[iat] * amp[jat];
                 om[4*iat][4*jat+3] = stv * zji * amp[iat] * amp[jat];
             
-                stv = sqrt(8.0) * rcov_sphere[iat] * r * sji;
-                //om4[iat][1][jat][0] = stv * xji * amp[iat] * amp[jat];
+                stv = sqrt(8.0) * rcov_sphere[iat] * r * sji * -1.0;
                 om[4*iat+1][4*jat] = stv * xji * amp[iat] * amp[jat];
-                //om4[iat][2][jat][0] = stv * yji * amp[iat] * amp[jat];
-                om[4*iat+1][4*jat] = stv * yji * amp[iat] * amp[jat];
-                //om4[iat][3][jat][0] = stv * zji * amp[iat] * amp[jat];
-                om[4*iat+1][4*jat] = stv * zji * amp[iat] * amp[jat];
+                om[4*iat+2][4*jat] = stv * yji * amp[iat] * amp[jat];
+                om[4*iat+3][4*jat] = stv * zji * amp[iat] * amp[jat];
 
                 // <pj|pi>
                 stv = -8.0 * rcov_sphere[iat]*rcov_sphere[jat] * r * r * sji;
-                //om4[iat][1][jat][1] = stv * ( xji * xji - 0.5/r ) * amp[iat] * amp[jat];
-                //om4[iat][1][jat][2] = stv * ( yji * xji         ) * amp[iat] * amp[jat];
-                //om4[iat][1][jat][3] = stv * ( zji * xji         ) * amp[iat] * amp[jat];
-                //om4[iat][2][jat][1] = stv * ( xji * yji         ) * amp[iat] * amp[jat];
-                //om4[iat][2][jat][2] = stv * ( yji * yji - 0.5/r ) * amp[iat] * amp[jat];
-                //om4[iat][2][jat][3] = stv * ( zji * yji         ) * amp[iat] * amp[jat];
-                //om4[iat][3][jat][1] = stv * ( xji * zji         ) * amp[iat] * amp[jat];
-                //om4[iat][3][jat][2] = stv * ( yji * zji         ) * amp[iat] * amp[jat];
-                //om4[iat][3][jat][3] = stv * ( zji * zji - 0.5/r ) * amp[iat] * amp[jat];
-
                 om[4*iat+1][4*jat+1] = stv * ( xji * xji - 0.5/r ) * amp[iat] * amp[jat];
                 om[4*iat+1][4*jat+2] = stv * ( yji * xji         ) * amp[iat] * amp[jat];
                 om[4*iat+1][4*jat+3] = stv * ( zji * xji         ) * amp[iat] * amp[jat];
@@ -348,22 +311,13 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
             }
         }
 
-        //for (i = 0; i < n_sphere; i++) 
-        //    for ( ii = 0; ii < 4; ii++) 
-        //        for ( j = 0; j < n_sphere; j++) 
-        //            for ( jj = 0; jj < 4; jj++) 
-        //                om[4*i + ii][4*j + jj] = om4[i][ii][j][jj];
-
-
     }
 
     
-    for (i = 0; i < 1*n_sphere; i++)
-        for (j = 0; j< 1*n_sphere; j++)
+    for (i = 0; i < lseg*n_sphere; i++)
+        for (j = 0; j< lseg*n_sphere; j++)
             if (fabs(om[i][j] - om[j][i]) > 1e-6) 
                 printf(" om  %d %d %g %g\n", i, j, om[i][j], om[j][i]);
-
-
 
 
 }

@@ -11,9 +11,9 @@ int main() {
     double aa = 0.52917720859, t;
     int i, j, k, iconf, *typt;
     char sbuf[2]="Ab";
-    char **symb, *orb="s";
+    char **symb, *orb="sp";
 
-    int nconf, nat, ntyp, lseg=1, l=1, natx=100;
+    int nconf, nat, ntyp, lseg=4, l=2, natx=100;
     double cutoff, **sfp, **lfp;
     int types[]={1,1,1,1,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3};
 
