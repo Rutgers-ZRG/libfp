@@ -1,3 +1,5 @@
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,16 +13,20 @@ int main() {
     double aa = 0.52917720859, t;
     int i, j, k, iconf, *typt;
     char sbuf[2]="Ab";
-    char **symb, *orb="sp";
+    char **symb, *orb="s";
 
-    int nconf, nat, ntyp, lseg=4, l=2, natx=100;
+    int nconf, nat, ntyp, lseg=1, l=1, natx=100;
     double cutoff, **sfp, **lfp;
     int types[]={1,1,1,1,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3};
 
-    scanf("%d", &nconf);
-    scanf("%d", &nat);
-    scanf("%d", &ntyp);
-    scanf("%lf", &cutoff);
+    //scanf("%d", &nconf);
+    //scanf("%d", &nat);
+    //scanf("%d", &ntyp);
+    //scanf("%lf", &cutoff);
+    nconf = 10;
+    nat = 20;
+    ntyp =3 ;
+    cutoff = 15;
 
     sfp = (double **) malloc(sizeof(double)*nat);
     lfp = (double **) malloc(sizeof(double)*nat);
@@ -54,7 +60,7 @@ int main() {
             lat[i][0] *= (sc/aa);
             lat[i][1] *= (sc/aa);
             lat[i][2] *= (sc/aa);
-            printf("%15.9f %15.9f %15.9f\n", lat[i][0], lat[i][1], lat[i][2]);
+            //printf("%15.9f %15.9f %15.9f\n", lat[i][0], lat[i][1], lat[i][2]);
         }
 
         for (i = 0; i < ntyp; i++){

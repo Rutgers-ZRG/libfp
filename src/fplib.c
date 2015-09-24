@@ -1,7 +1,13 @@
-// Copyright (C) 2015 Li Zhu
-// All rights reserved.
+/* Copyright (C) 2015 Li Zhu */
+/* All rights reserved. */
 
-// This file is part of fplib.
+/* fplib.c */
+/* This file is part of fplib. */
+
+/* This file is distributed under the terms of the            */
+/* GNN Lesser General Public License Version 3.0.             */
+/* See ../LICENSE or http://www.gnu.org/licenses/lgpl-3.0.txt */
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,7 +29,6 @@ void get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
     double lat2[3][3];
     double rcov[nat];
 
-    //Cell * cell;
     int lseg, l;
 
 
@@ -39,11 +44,8 @@ void get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
     }
 
 
-    for (i = 0; i < nat; i++){
-       rcov[i] = get_rcov( symb[types[i]-1] );
-       //printf("rcov[%d] = %g\n", i, rcov[i]);
-    }
-
+    for (i = 0; i < nat; i++)
+        rcov[i] = get_rcov( symb[types[i]-1] );
 
     n = 3;
     lda = n;
@@ -64,8 +66,8 @@ void get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
     work = (double*) malloc(lwork*sizeof(double));
     dsyev("V", "U", &n, a, &lda, w, work, &lwork, &info);
     if (info > 0 ) {
-         fprintf(stderr, "Error: DSYEV 1");
-         exit(1);
+        fprintf(stderr, "Error: DSYEV 1");
+        exit(1);
     }
 
     ixyz = (int)(sqrt(1.0/w[0])*cutoff + 1);
@@ -77,7 +79,7 @@ void get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
     // get sphere info
 
     //info = get_fp(cell, ixyz, natx, lseg, l, cutoff);
-    info = get_fp(nat, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp);
+    info = get_fp(nat, ntyp, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp);
 
     //for (i = 0; i < nat; i++)
     //    for (j = 0; j < natx; j++)
@@ -92,14 +94,14 @@ void get_fingerprint_periodic(int nat, int ntyp, int types[], double lat[3][3],
 
 }
 
-int get_fp(int nat, int ixyz, int nx, int lseg, int l, double lat[3][3],
+int get_fp(int nat, int ntyp, int ixyz, int nx, int lseg, int l, double lat[3][3],
         double rxyz[][3], int types[], double rcov[], double cutoff, double **lfp, double **sfp)
 {
-    int iat, jat, ix, iy, iz, il, i, j;
-    int n_sphere, ityp_sphere, nid;
+    int iat, jat, ix, iy, iz, il, i, j, idsy;
+    int n_sphere, ityp_sphere, nid, nids = l*(ntyp+1);
     int n_sphere_min = 1000000;
     int n_sphere_max = 0;
-    int ind[nx];
+    int ind[nx*lseg];
     double xi, yi, zi, xj, yj, zj, d2;
     double cutoff2 = cutoff*cutoff;
     double rxyz_sphere[nx][3];
@@ -107,13 +109,12 @@ int get_fp(int nat, int ixyz, int nx, int lseg, int l, double lat[3][3],
     double amp[nx];
     double fc, wc;
 
-    double **om;
+    double **om, *pvec;
+    double omx[nids][nids], omy[nids][nids];
 
     int n, lda, info, lwork;
     double wkopt;
-    double* work;
-    double* w;
-    double* a;
+    double *work, *w, *a, *b;
 
 
     wc = cutoff/sqrt(2.0*NC);
@@ -135,8 +136,8 @@ int get_fp(int nat, int ixyz, int nx, int lseg, int l, double lat[3][3],
                         if (d2 <= cutoff2) {
                             n_sphere++;
                             if (n_sphere > nx) {
-                                 fprintf(stderr, "Error: cutoff is too large.");
-                                 return 1;
+                                fprintf(stderr, "Error: cutoff is too large.");
+                                return 1;
                             }
                             amp[n_sphere-1] = pow((1.0 - d2*fc), NC);
                             rxyz_sphere[n_sphere-1][0] = xj;
@@ -148,13 +149,14 @@ int get_fp(int nat, int ixyz, int nx, int lseg, int l, double lat[3][3],
                             } else {
                                 ityp_sphere = types[jat];
                             }
-                            //for (il = 0; il < lseg; il++) {
-                            //    if (il == 0){
-                            //        ind[il+lseg*(n_sphere-1)] = ityp_sphere*il + 1;
-                            //    } else {
-                            //        ind[il+lseg*(n_sphere-1)] = ityp_sphere*il + 2;
-                            //    }
-                            //}
+
+                            for (il = 0; il < lseg; il++) {
+                                if (il == 0){
+                                    ind[il+lseg*(n_sphere-1)] = ityp_sphere * l + 0;
+                                } else {
+                                    ind[il+lseg*(n_sphere-1)] = ityp_sphere * l + 1;
+                                }
+                            }
 
                         }
 
@@ -181,6 +183,10 @@ int get_fp(int nat, int ixyz, int nx, int lseg, int l, double lat[3][3],
             }
         }
 
+        if ( (pvec = (double *) malloc(sizeof(double)*nid)) == NULL ){
+            fprintf(stderr, "Memory could not be allocated.");
+            exit(1);}
+
 
         creat_om( lseg, n_sphere, rxyz_sphere, rcov_sphere, amp, om );
 
@@ -190,8 +196,8 @@ int get_fp(int nat, int ixyz, int nx, int lseg, int l, double lat[3][3],
             exit(1);}
 
         if ( (w = (double *) malloc(sizeof(double)*nid)) == NULL) {
-           fprintf(stderr, "Memory could not be allocated.");
-           exit(1);}
+            fprintf(stderr, "Memory could not be allocated.");
+            exit(1);}
 
         for (i = 0; i < nid; i++)
             for (j = 0; j< nid; j++)
@@ -202,8 +208,8 @@ int get_fp(int nat, int ixyz, int nx, int lseg, int l, double lat[3][3],
         lda = nid;
         lwork = -1;
 
-       /// for (i = 0; i< nid*nid; i++)
-       ///     printf("a[%d]= %g\n", i, a[i]);
+        /// for (i = 0; i< nid*nid; i++)
+        ///     printf("a[%d]= %g\n", i, a[i]);
 
         dsyev("V", "U", &nid, a, &lda, w, &wkopt, &lwork, &info);
         lwork = (int)wkopt;
@@ -216,27 +222,80 @@ int get_fp(int nat, int ixyz, int nx, int lseg, int l, double lat[3][3],
             printf("w[0] = %g\n", w[0]);
             fprintf(stderr, "Error: Negative w");
             exit(1); }
-        
+
+        for (i = 0; i < nid; i++)
+            pvec[i] = a[i + (nid-1)*nid];
 
         for (i = 0; i < nid; i++)
             lfp[iat][i] = w[nid-1-i];
         for (i = nid; i < nx; i++)
             lfp[iat][i] = 0.0;
 
-        // printf("%d, ", iat);
-        // for (i = 0; i < nx; i++)
-        //     printf("  %g  ", lfp[iat][i]);
-        // printf("\n");
-
-        // contract
-
-
         free(w);
-        free(work);
         free(a);
+
+
+        /* contract */
+        nids = l*(ntyp+1);
+
+        for (i = 0; i < nids; i++) {
+            for (j = 0; j < nids; j++) {
+                omx[i][j] = 0.0;
+                omy[i][j] = 0.0;
+            }
+        }
+
+        for (i = 0; i < nid; i++)
+            for (j = 0; j < nid; j++)
+                omx[ind[i]][ind[j]] = omx[ind[i]][ind[j]] + pvec[i] * om[i][j] * pvec[j];
+
+        for (i = 0; i < nid; i++)
+            omy[ind[i]][ind[i]] = omx[ind[i]][ind[i]] + pvec[i] * pvec[i];
+
+        for (i = 0; i < nids; i++)
+            if (omy[i][i] == 0.0)  omy[i][i] = 1.0;
+
+        if ( (a = (double *) malloc(sizeof(double)*nids*nids)) == NULL) {
+            fprintf(stderr, "Memory could not be allocated.");
+            exit(1);}
+        if ( (b = (double *) malloc(sizeof(double)*nids*nids)) == NULL) {
+            fprintf(stderr, "Memory could not be allocated.");
+            exit(1);}
+
+        if ( (w = (double *) malloc(sizeof(double)*nids)) == NULL) {
+            fprintf(stderr, "Memory could not be allocated.");
+            exit(1);} 
+
+        for (i = 0; i < nids; i++){
+            for (j = 0; j< nids; j++){
+                a[i*nids + j] = omx[j][i];
+                b[i*nids + j] = omy[j][i];
+            }
+        }
+
+        idsy = 1;
+        dsygv(&idsy, "N", "U", &nids, a, &nids, b, &nids, w, work, &lwork, &info);
+
+        for (i = 0; i < nids; i++)
+            sfp[iat][i] = w[nids-1-i];
+
+        /*
+        printf("iat = %d\n", iat);
+        for (i = 0; i < nids; i++)
+            printf(" %e ", sfp[iat][i]);
+        printf("\n");
+        */
+
+        free(a);
+        free(b);
+        free(w);
+
+        free(work);
         for (i = 0; i < n_sphere; i++)
             free(om[i]);
         free(om);
+        free(pvec);
+
 
     }
     printf("min  %d, max  %d\n", n_sphere_min, n_sphere_max);
@@ -251,7 +310,7 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
     double xi, yi, zi, xj, yj, zj, xji, yji, zji;
     double d2, r, sji, stv;
 
-    if (lseg == 1) {
+    if (lseg == 1) { /* s orbital only */
         for (iat = 0; iat < n_sphere; iat++) {
             xi = rxyz_sphere[iat][0];
             yi = rxyz_sphere[iat][1];
@@ -264,10 +323,10 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
                 d2 = (xi-xj)*(xi-xj) + (yi-yj)*(yi-yj) + (zi-zj)*(zi-zj);
                 r = 0.5/(rcov_sphere[iat]*rcov_sphere[iat] + rcov_sphere[jat]*rcov_sphere[jat]);
                 om[iat][jat] = pow(sqrt(4.0 * r * (rcov_sphere[iat]*rcov_sphere[jat])), 3)
-                        * exp(-d2 * r) * amp[iat] * amp[jat];
+                    * exp(-d2 * r) * amp[iat] * amp[jat];
             }
         }
-    } else {
+    } else { /* both s and p orbital */
         for (iat = 0; iat < n_sphere; iat++) {
             xi = rxyz_sphere[iat][0];
             yi = rxyz_sphere[iat][1];
@@ -283,15 +342,15 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
                 d2 = xji*xji + yji*yji+zji*zji;
                 r = 0.5/(rcov_sphere[iat]*rcov_sphere[iat] + rcov_sphere[jat]*rcov_sphere[jat]);
                 om[4*iat][4*jat] = pow(sqrt(4.0 * r * (rcov_sphere[iat]*rcov_sphere[jat])), 3)
-                        * exp(-d2 * r) * amp[iat] * amp[jat];
-                
+                    * exp(-d2 * r) * amp[iat] * amp[jat];
+
                 // <pj|si>
                 sji = pow(sqrt(4.0*r*rcov_sphere[iat]*rcov_sphere[jat]), 3) * exp(-d2 * r);
                 stv = sqrt(8.0) * rcov_sphere[jat] * r * sji;
                 om[4*iat][4*jat+1] = stv * xji * amp[iat] * amp[jat];
                 om[4*iat][4*jat+2] = stv * yji * amp[iat] * amp[jat];
                 om[4*iat][4*jat+3] = stv * zji * amp[iat] * amp[jat];
-            
+
                 stv = sqrt(8.0) * rcov_sphere[iat] * r * sji * -1.0;
                 om[4*iat+1][4*jat] = stv * xji * amp[iat] * amp[jat];
                 om[4*iat+2][4*jat] = stv * yji * amp[iat] * amp[jat];
@@ -313,7 +372,7 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
 
     }
 
-    
+
     for (i = 0; i < lseg*n_sphere; i++)
         for (j = 0; j< lseg*n_sphere; j++)
             if (fabs(om[i][j] - om[j][i]) > 1e-6) 

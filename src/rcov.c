@@ -1,5 +1,12 @@
-// rcov.c 
-// Copyright (C) 2015 Li Zhu
+/* Copyright (C) 2015 Li Zhu */
+/* All rights reserved. */
+
+/* rcov.c */
+/* This file is part of fplib. */
+
+/* This file is distributed under the terms of the            */
+/* GNN Lesser General Public License Version 3.0.             */
+/* See ../LICENSE or http://www.gnu.org/licenses/lgpl-3.0.txt */
 
 #include <stdio.h>
 #include <stdlib.h>
