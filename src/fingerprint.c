@@ -1,12 +1,28 @@
-/* Copyright (C) 2015 Li Zhu */
-/* All rights reserved. */
-
-/* fingerprint.c */
-/* This file is part of fplib. */
-
-/* This file is distributed under the terms of the            */
-/* GNN Lesser General Public License Version 3.0.             */
-/* See ../LICENSE or http://www.gnu.org/licenses/lgpl-3.0.txt */
+/*******************************************************************************
+ * Copyright (C) 2015 Li Zhu 
+ * All rights reserved. 
+ * 
+ * fingerprint.c
+ * This file is part of fplib.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * ****************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,7 +33,7 @@
 void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, double lat[3][3],
         double rxyz[][3], int types[], double rcov[], double cutoff, double **lfp, double **sfp)
 {
-    int iat, jat, ix, iy, iz, il, i, j, idsy;
+    int iat, jat, ix, iy, iz, il, i, j;
     int n_sphere, ityp_sphere, nid, nids = l*(ntyp+1);
     int n_sphere_min = 1000000;
     int n_sphere_max = 0;
@@ -34,11 +50,11 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
 
     int n, lda, info, lwork;
     double wkopt;
-    double *work, *w, *a, *b;
+    double *work, *w, *a;
 
 
-    wc = cutoff/sqrt(2.0*NC);
-    fc = 1.0/(2.0*NC*wc*wc);
+    wc = cutoff / sqrt(2.0 * NC);
+    fc = 1.0 / (2.0 * NC * wc * wc);
 
     for (iat = 0; iat < nat; iat++) {
         xi = rxyz[iat][0];
@@ -79,7 +95,6 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
                             }
 
                         }
-
                     }
                 }
             }
@@ -155,6 +170,7 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
 
         free(w);
         free(a);
+        free(work);
 
 
         if (flag >= 0 ){
@@ -172,16 +188,8 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
                 for (j = 0; j < nid; j++)
                     omx[ind[i]][ind[j]] = omx[ind[i]][ind[j]] + pvec[i] * om[i][j] * pvec[j];
 
-            for (i = 0; i < nid; i++)
-                omy[ind[i]][ind[i]] = omx[ind[i]][ind[i]] + pvec[i] * pvec[i];
-
-            for (i = 0; i < nids; i++)
-                if (omy[i][i] == 0.0)  omy[i][i] = 1.0;
 
             if ( (a = (double *) malloc(sizeof(double)*nids*nids)) == NULL) {
-                fprintf(stderr, "Memory could not be allocated.");
-                exit(1);}
-            if ( (b = (double *) malloc(sizeof(double)*nids*nids)) == NULL) {
                 fprintf(stderr, "Memory could not be allocated.");
                 exit(1);}
 
@@ -192,12 +200,17 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
             for (i = 0; i < nids; i++){
                 for (j = 0; j< nids; j++){
                     a[i*nids + j] = omx[j][i];
-                    b[i*nids + j] = omy[j][i];
                 }
             }
 
-            idsy = 1;
-            dsygv(&idsy, "N", "U", &nids, a, &nids, b, &nids, w, work, &lwork, &info);
+            
+            lda = nids;
+            lwork = -1;
+            dsyev("V", "U", &nids, a, &lda, w, &wkopt, &lwork, &info);
+            lwork = (int)wkopt;
+            work = (double*) malloc(lwork*sizeof(double));
+            dsyev("V", "U", &nids, a, &lda, w, work, &lwork, &info);
+            
 
             for (i = 0; i < nids; i++)
                 sfp[iat][i] = w[nids-1-i];
@@ -210,7 +223,6 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
                */
 
             free(a);
-            free(b);
             free(w);
         }
 
@@ -262,24 +274,25 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
                 xji = xj - xi;
                 yji = yj - yi;
                 zji = zj - zi;
-                d2 = xji*xji + yji*yji+zji*zji;
-                r = 0.5/(rcov_sphere[iat]*rcov_sphere[iat] + rcov_sphere[jat]*rcov_sphere[jat]);
+                d2 = xji*xji + yji*yji + zji*zji;
+                r = 0.5/(rcov_sphere[iat] * rcov_sphere[iat] + rcov_sphere[jat] * rcov_sphere[jat]);
                 om[4*iat][4*jat] = pow(sqrt(4.0 * r * (rcov_sphere[iat]*rcov_sphere[jat])), 3)
                     * exp(-d2 * r) * amp[iat] * amp[jat];
 
-                // <pj|si>
+                /* <si|pj> */
                 sji = pow(sqrt(4.0*r*rcov_sphere[iat]*rcov_sphere[jat]), 3) * exp(-d2 * r);
                 stv = sqrt(8.0) * rcov_sphere[jat] * r * sji;
                 om[4*iat][4*jat+1] = stv * xji * amp[iat] * amp[jat];
                 om[4*iat][4*jat+2] = stv * yji * amp[iat] * amp[jat];
                 om[4*iat][4*jat+3] = stv * zji * amp[iat] * amp[jat];
 
+                /* <pi|sj> */
                 stv = sqrt(8.0) * rcov_sphere[iat] * r * sji * -1.0;
                 om[4*iat+1][4*jat] = stv * xji * amp[iat] * amp[jat];
                 om[4*iat+2][4*jat] = stv * yji * amp[iat] * amp[jat];
                 om[4*iat+3][4*jat] = stv * zji * amp[iat] * amp[jat];
 
-                // <pj|pi>
+                /* <pi|pj> */
                 stv = -8.0 * rcov_sphere[iat]*rcov_sphere[jat] * r * r * sji;
                 om[4*iat+1][4*jat+1] = stv * ( xji * xji - 0.5/r ) * amp[iat] * amp[jat];
                 om[4*iat+1][4*jat+2] = stv * ( yji * xji         ) * amp[iat] * amp[jat];
@@ -292,15 +305,17 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
                 om[4*iat+3][4*jat+3] = stv * ( zji * zji - 0.5/r ) * amp[iat] * amp[jat];
             }
         }
-
     }
 
 
-    for (i = 0; i < lseg*n_sphere; i++)
-        for (j = 0; j< lseg*n_sphere; j++)
-            if (fabs(om[i][j] - om[j][i]) > 1e-6) 
-                printf(" om  %d %d %g %g\n", i, j, om[i][j], om[j][i]);
-
+    for (i = 0; i < lseg*n_sphere; i++){
+        for (j = 0; j< lseg*n_sphere; j++){
+            if (fabs(om[i][j] - om[j][i]) > 1e-6) {
+                printf("OM SYMMETRY ERROR\n");
+                printf("OM[%d][%d]=%g, OM[%d][%d]=%g\n", i, j, om[i][j], j, i, om[j][i]);
+            }
+        }
+    }
 
 }
 
