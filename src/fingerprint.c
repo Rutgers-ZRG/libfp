@@ -48,7 +48,7 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
     double **om, *pvec;
     double omx[nids][nids], omy[nids][nids];
 
-    int n, lda, info, lwork;
+    int lda, info, lwork;
     double wkopt;
     double *work, *w, *a;
 
@@ -241,7 +241,7 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
         double amp[], double **om)
 {
 
-    int iat, jat, i, j, ii, jj;
+    int iat, jat, i, j;
     double xi, yi, zi, xj, yj, zj, xji, yji, zji;
     double d2, r, sji, stv;
 
@@ -321,7 +321,7 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
 
 int get_ixyz(double lat[3][3], double cutoff)
 {
-    int i, j, k, ixyz;
+    int i, j, ixyz;
     int n = 3, lda = 3, info, lwork;
     double* work;
     double wkopt, w[3], a[9], lat2[3][3];

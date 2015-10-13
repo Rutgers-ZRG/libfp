@@ -66,7 +66,7 @@ void get_fp_periodic_short(int lmax, int nat, int ntyp, int types[], double lat[
         double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp)
 {
     int i, ixyz, flag = 1;
-    double rcov[nat], **lfp;
+    double rcov[nat], **lfp = NULL;
     int lseg, l;
 
     if (lmax == 0){
@@ -93,7 +93,7 @@ void get_fp_periodic_long(int lmax, int nat, int ntyp, int types[], double lat[3
         double rxyz[][3], int znucl[], int natx, double cutoff, double **lfp)
 {
     int i, ixyz, flag = -1;
-    double rcov[nat], **sfp;
+    double rcov[nat], **sfp = NULL;
     int lseg, l;
 
     if (lmax == 0){
@@ -120,7 +120,7 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
         double **fp1, double **fp2)
 {
     double fpd, cc, tt, costmp[nat][nat], *a;
-    int iat, jat, ityp, i, j, k, l, ii, jj, msize, *f;
+    int iat, jat, ityp, i, j, k, ii, jj, *f;
 
     fpd = 0.0;
 
