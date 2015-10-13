@@ -26,124 +26,122 @@
 
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-double get_rcov(char * s) {
+double get_rcov(int z) {
     double rcov;
     
-    if      (strcmp(s, "H" ) == 0)  rcov = 0.37;
-    else if (strcmp(s, "He") == 0)  rcov = 0.32;
-    else if (strcmp(s, "Li") == 0)  rcov = 1.34;
-    else if (strcmp(s, "Be") == 0)  rcov = 0.90;
-    else if (strcmp(s, "B" ) == 0)  rcov = 0.82;
-    else if (strcmp(s, "C" ) == 0)  rcov = 0.77;
-    else if (strcmp(s, "N" ) == 0)  rcov = 0.75;
-    else if (strcmp(s, "O" ) == 0)  rcov = 0.73;
-    else if (strcmp(s, "F" ) == 0)  rcov = 0.71;
-    else if (strcmp(s, "Ne") == 0)  rcov = 0.69;
-    else if (strcmp(s, "Na") == 0)  rcov = 1.54;
-    else if (strcmp(s, "Mg") == 0)  rcov = 1.30;
-    else if (strcmp(s, "Al") == 0)  rcov = 1.18;
-    else if (strcmp(s, "Si") == 0)  rcov = 1.11;
-    else if (strcmp(s, "P" ) == 0)  rcov = 1.06;
-    else if (strcmp(s, "S" ) == 0)  rcov = 1.02;
-    else if (strcmp(s, "Cl") == 0)  rcov = 0.99;
-    else if (strcmp(s, "Ar") == 0)  rcov = 0.97;
-    else if (strcmp(s, "K" ) == 0)  rcov = 1.96;
-    else if (strcmp(s, "Ca") == 0)  rcov = 1.74;
-    else if (strcmp(s, "Sc") == 0)  rcov = 1.44;
-    else if (strcmp(s, "Ti") == 0)  rcov = 1.36;
-    else if (strcmp(s, "V" ) == 0)  rcov = 1.25;
-    else if (strcmp(s, "Cr") == 0)  rcov = 1.27;
-    else if (strcmp(s, "Mn") == 0)  rcov = 1.39;
-    else if (strcmp(s, "Fe") == 0)  rcov = 1.25;
-    else if (strcmp(s, "Co") == 0)  rcov = 1.26;
-    else if (strcmp(s, "Ni") == 0)  rcov = 1.21;
-    else if (strcmp(s, "Cu") == 0)  rcov = 1.38;
-    else if (strcmp(s, "Zn") == 0)  rcov = 1.31;
-    else if (strcmp(s, "Ga") == 0)  rcov = 1.26;
-    else if (strcmp(s, "Ge") == 0)  rcov = 1.22;
-    else if (strcmp(s, "As") == 0)  rcov = 1.19;
-    else if (strcmp(s, "Se") == 0)  rcov = 1.16;
-    else if (strcmp(s, "Br") == 0)  rcov = 1.14;
-    else if (strcmp(s, "Kr") == 0)  rcov = 1.10;
-    else if (strcmp(s, "Rb") == 0)  rcov = 2.11;
-    else if (strcmp(s, "Sr") == 0)  rcov = 1.92;
-    else if (strcmp(s, "Y" ) == 0)  rcov = 1.62;
-    else if (strcmp(s, "Zr") == 0)  rcov = 1.48;
-    else if (strcmp(s, "Nb") == 0)  rcov = 1.37;
-    else if (strcmp(s, "Mo") == 0)  rcov = 1.45;
-    else if (strcmp(s, "Tc") == 0)  rcov = 1.56;
-    else if (strcmp(s, "Ru") == 0)  rcov = 1.26;
-    else if (strcmp(s, "Rh") == 0)  rcov = 1.35;
-    else if (strcmp(s, "Pd") == 0)  rcov = 1.31;
-    else if (strcmp(s, "Ag") == 0)  rcov = 1.53;
-    else if (strcmp(s, "Cd") == 0)  rcov = 1.48;
-    else if (strcmp(s, "In") == 0)  rcov = 1.44;
-    else if (strcmp(s, "Sn") == 0)  rcov = 1.41;
-    else if (strcmp(s, "Sb") == 0)  rcov = 1.38;
-    else if (strcmp(s, "Te") == 0)  rcov = 1.35;
-    else if (strcmp(s, "I" ) == 0)  rcov = 1.33;
-    else if (strcmp(s, "Xe") == 0)  rcov = 1.30;
-    else if (strcmp(s, "Cs") == 0)  rcov = 2.25;
-    else if (strcmp(s, "Ba") == 0)  rcov = 1.98;
-    else if (strcmp(s, "La") == 0)  rcov = 1.80;
-    else if (strcmp(s, "Ce") == 0)  rcov = 1.63;
-    else if (strcmp(s, "Pr") == 0)  rcov = 1.76;
-    else if (strcmp(s, "Nd") == 0)  rcov = 1.74;
-    else if (strcmp(s, "Pm") == 0)  rcov = 1.73;
-    else if (strcmp(s, "Sm") == 0)  rcov = 1.72;
-    else if (strcmp(s, "Eu") == 0)  rcov = 1.68;
-    else if (strcmp(s, "Gd") == 0)  rcov = 1.69;
-    else if (strcmp(s, "Tb") == 0)  rcov = 1.68;
-    else if (strcmp(s, "Dy") == 0)  rcov = 1.67;
-    else if (strcmp(s, "Ho") == 0)  rcov = 1.66;
-    else if (strcmp(s, "Er") == 0)  rcov = 1.65;
-    else if (strcmp(s, "Tm") == 0)  rcov = 1.64;
-    else if (strcmp(s, "Yb") == 0)  rcov = 1.70;
-    else if (strcmp(s, "Lu") == 0)  rcov = 1.60;
-    else if (strcmp(s, "Hf") == 0)  rcov = 1.50;
-    else if (strcmp(s, "Ta") == 0)  rcov = 1.38;
-    else if (strcmp(s, "W" ) == 0)  rcov = 1.46;
-    else if (strcmp(s, "Re") == 0)  rcov = 1.59;
-    else if (strcmp(s, "Os") == 0)  rcov = 1.28;
-    else if (strcmp(s, "Ir") == 0)  rcov = 1.37;
-    else if (strcmp(s, "Pt") == 0)  rcov = 1.28;
-    else if (strcmp(s, "Au") == 0)  rcov = 1.44;
-    else if (strcmp(s, "Hg") == 0)  rcov = 1.49;
-    else if (strcmp(s, "Tl") == 0)  rcov = 1.48;
-    else if (strcmp(s, "Pb") == 0)  rcov = 1.47;
-    else if (strcmp(s, "Bi") == 0)  rcov = 1.46;
-    else if (strcmp(s, "Po") == 0)  rcov = 1.45;
-    else if (strcmp(s, "At") == 0)  rcov = 1.47;
-    else if (strcmp(s, "Rn") == 0)  rcov = 1.42;
-    else if (strcmp(s, "Fr") == 0)  rcov = 2.23;
-    else if (strcmp(s, "Ra") == 0)  rcov = 2.01;
-    else if (strcmp(s, "Ac") == 0)  rcov = 1.86;
-    else if (strcmp(s, "Th") == 0)  rcov = 1.75;
-    else if (strcmp(s, "Pa") == 0)  rcov = 1.69;
-    else if (strcmp(s, "U" ) == 0)  rcov = 1.70;
-    else if (strcmp(s, "Np") == 0)  rcov = 1.71;
-    else if (strcmp(s, "Pu") == 0)  rcov = 1.72;
-    else if (strcmp(s, "Am") == 0)  rcov = 1.66;
-    else if (strcmp(s, "Cm") == 0)  rcov = 1.66;
-    else if (strcmp(s, "Bk") == 0)  rcov = 1.68;
-    else if (strcmp(s, "Cf") == 0)  rcov = 1.68;
-    else if (strcmp(s, "Es") == 0)  rcov = 1.65;
-    else if (strcmp(s, "Fm") == 0)  rcov = 1.67;
-    else if (strcmp(s, "Md") == 0)  rcov = 1.73;
-    else if (strcmp(s, "No") == 0)  rcov = 1.76;
-    else if (strcmp(s, "Lr") == 0)  rcov = 1.61;
-    else if (strcmp(s, "Rf") == 0)  rcov = 1.57;
-    else if (strcmp(s, "Db") == 0)  rcov = 1.49;
-    else if (strcmp(s, "Sg") == 0)  rcov = 1.43;
-    else if (strcmp(s, "Bh") == 0)  rcov = 1.41;
-    else if (strcmp(s, "Hs") == 0)  rcov = 1.34;
-    else if (strcmp(s, "Mt") == 0)  rcov = 1.29;
-    else if (strcmp(s, "Ds") == 0)  rcov = 1.28;
-    else if (strcmp(s, "Rg") == 0)  rcov = 1.21;
-    else if (strcmp(s, "Cn") == 0)  rcov = 1.22;
+    if      ( z == 1  )  rcov = 0.37;   /* "H"   */
+    else if ( z == 2  )  rcov = 0.32;   /* "He"  */
+    else if ( z == 3  )  rcov = 1.34;   /* "Li"  */
+    else if ( z == 4  )  rcov = 0.90;   /* "Be"  */
+    else if ( z == 5  )  rcov = 0.82;   /* "B"   */
+    else if ( z == 6  )  rcov = 0.77;   /* "C"   */
+    else if ( z == 7  )  rcov = 0.75;   /* "N"   */
+    else if ( z == 8  )  rcov = 0.73;   /* "O"   */
+    else if ( z == 9  )  rcov = 0.71;   /* "F"   */
+    else if ( z == 10 )  rcov = 0.69;   /* "Ne"  */
+    else if ( z == 11 )  rcov = 1.54;   /* "Na"  */
+    else if ( z == 12 )  rcov = 1.30;   /* "Mg"  */
+    else if ( z == 13 )  rcov = 1.18;   /* "Al"  */
+    else if ( z == 14 )  rcov = 1.11;   /* "Si"  */
+    else if ( z == 15 )  rcov = 1.06;   /* "P"   */
+    else if ( z == 16 )  rcov = 1.02;   /* "S"   */
+    else if ( z == 17 )  rcov = 0.99;   /* "Cl"  */
+    else if ( z == 18 )  rcov = 0.97;   /* "Ar"  */
+    else if ( z == 19 )  rcov = 1.96;   /* "K"   */
+    else if ( z == 20 )  rcov = 1.74;   /* "Ca"  */
+    else if ( z == 21 )  rcov = 1.44;   /* "Sc"  */
+    else if ( z == 22 )  rcov = 1.36;   /* "Ti"  */
+    else if ( z == 23 )  rcov = 1.25;   /* "V"   */
+    else if ( z == 24 )  rcov = 1.27;   /* "Cr"  */
+    else if ( z == 25 )  rcov = 1.39;   /* "Mn"  */
+    else if ( z == 26 )  rcov = 1.25;   /* "Fe"  */
+    else if ( z == 27 )  rcov = 1.26;   /* "Co"  */
+    else if ( z == 28 )  rcov = 1.21;   /* "Ni"  */
+    else if ( z == 29 )  rcov = 1.38;   /* "Cu"  */
+    else if ( z == 30 )  rcov = 1.31;   /* "Zn"  */
+    else if ( z == 31 )  rcov = 1.26;   /* "Ga"  */
+    else if ( z == 32 )  rcov = 1.22;   /* "Ge"  */
+    else if ( z == 33 )  rcov = 1.19;   /* "As"  */
+    else if ( z == 34 )  rcov = 1.16;   /* "Se"  */
+    else if ( z == 35 )  rcov = 1.14;   /* "Br"  */
+    else if ( z == 36 )  rcov = 1.10;   /* "Kr"  */
+    else if ( z == 37 )  rcov = 2.11;   /* "Rb"  */
+    else if ( z == 38 )  rcov = 1.92;   /* "Sr"  */
+    else if ( z == 39 )  rcov = 1.62;   /* "Y"   */
+    else if ( z == 40 )  rcov = 1.48;   /* "Zr"  */
+    else if ( z == 41 )  rcov = 1.37;   /* "Nb"  */
+    else if ( z == 42 )  rcov = 1.45;   /* "Mo"  */
+    else if ( z == 43 )  rcov = 1.56;   /* "Tc"  */
+    else if ( z == 44 )  rcov = 1.26;   /* "Ru"  */
+    else if ( z == 45 )  rcov = 1.35;   /* "Rh"  */
+    else if ( z == 46 )  rcov = 1.31;   /* "Pd"  */
+    else if ( z == 47 )  rcov = 1.53;   /* "Ag"  */
+    else if ( z == 48 )  rcov = 1.48;   /* "Cd"  */
+    else if ( z == 49 )  rcov = 1.44;   /* "In"  */
+    else if ( z == 50 )  rcov = 1.41;   /* "Sn"  */
+    else if ( z == 51 )  rcov = 1.38;   /* "Sb"  */
+    else if ( z == 52 )  rcov = 1.35;   /* "Te"  */
+    else if ( z == 53 )  rcov = 1.33;   /* "I"   */
+    else if ( z == 54 )  rcov = 1.30;   /* "Xe"  */
+    else if ( z == 55 )  rcov = 2.25;   /* "Cs"  */
+    else if ( z == 56 )  rcov = 1.98;   /* "Ba"  */
+    else if ( z == 57 )  rcov = 1.80;   /* "La"  */
+    else if ( z == 58 )  rcov = 1.63;   /* "Ce"  */
+    else if ( z == 59 )  rcov = 1.76;   /* "Pr"  */
+    else if ( z == 60 )  rcov = 1.74;   /* "Nd"  */
+    else if ( z == 61 )  rcov = 1.73;   /* "Pm"  */
+    else if ( z == 62 )  rcov = 1.72;   /* "Sm"  */
+    else if ( z == 63 )  rcov = 1.68;   /* "Eu"  */
+    else if ( z == 64 )  rcov = 1.69;   /* "Gd"  */
+    else if ( z == 56 )  rcov = 1.68;   /* "Tb"  */
+    else if ( z == 66 )  rcov = 1.67;   /* "Dy"  */
+    else if ( z == 67 )  rcov = 1.66;   /* "Ho"  */
+    else if ( z == 68 )  rcov = 1.65;   /* "Er"  */
+    else if ( z == 69 )  rcov = 1.64;   /* "Tm"  */
+    else if ( z == 70 )  rcov = 1.70;   /* "Yb"  */
+    else if ( z == 71 )  rcov = 1.60;   /* "Lu"  */
+    else if ( z == 72 )  rcov = 1.50;   /* "Hf"  */
+    else if ( z == 73 )  rcov = 1.38;   /* "Ta"  */
+    else if ( z == 74 )  rcov = 1.46;   /* "W"   */
+    else if ( z == 75 )  rcov = 1.59;   /* "Re"  */
+    else if ( z == 76 )  rcov = 1.28;   /* "Os"  */
+    else if ( z == 77 )  rcov = 1.37;   /* "Ir"  */
+    else if ( z == 78 )  rcov = 1.28;   /* "Pt"  */
+    else if ( z == 79 )  rcov = 1.44;   /* "Au"  */
+    else if ( z == 80 )  rcov = 1.49;   /* "Hg"  */
+    else if ( z == 81 )  rcov = 1.48;   /* "Tl"  */
+    else if ( z == 82 )  rcov = 1.47;   /* "Pb"  */
+    else if ( z == 83 )  rcov = 1.46;   /* "Bi"  */
+    else if ( z == 84 )  rcov = 1.45;   /* "Po"  */
+    else if ( z == 85 )  rcov = 1.47;   /* "At"  */
+    else if ( z == 86 )  rcov = 1.42;   /* "Rn"  */
+    else if ( z == 87 )  rcov = 2.23;   /* "Fr"  */
+    else if ( z == 88 )  rcov = 2.01;   /* "Ra"  */
+    else if ( z == 89 )  rcov = 1.86;   /* "Ac"  */
+    else if ( z == 90 )  rcov = 1.75;   /* "Th"  */
+    else if ( z == 91 )  rcov = 1.69;   /* "Pa"  */
+    else if ( z == 92 )  rcov = 1.70;   /* "U"   */
+    else if ( z == 93 )  rcov = 1.71;   /* "Np"  */
+    else if ( z == 94 )  rcov = 1.72;   /* "Pu"  */
+    else if ( z == 95 )  rcov = 1.66;   /* "Am"  */
+    else if ( z == 96 )  rcov = 1.66;   /* "Cm"  */
+    else if ( z == 97 )  rcov = 1.68;   /* "Bk"  */
+    else if ( z == 98 )  rcov = 1.68;   /* "Cf"  */
+    else if ( z == 99 )  rcov = 1.65;   /* "Es"  */
+    else if ( z == 100)  rcov = 1.67;   /* "Fm"  */
+    else if ( z == 101)  rcov = 1.73;   /* "Md"  */
+    else if ( z == 102)  rcov = 1.76;   /* "No"  */
+    else if ( z == 103)  rcov = 1.61;   /* "Lr"  */
+    else if ( z == 104)  rcov = 1.57;   /* "Rf"  */
+    else if ( z == 105)  rcov = 1.49;   /* "Db"  */
+    else if ( z == 106)  rcov = 1.43;   /* "Sg"  */
+    else if ( z == 107)  rcov = 1.41;   /* "Bh"  */
+    else if ( z == 108)  rcov = 1.34;   /* "Hs"  */
+    else if ( z == 109)  rcov = 1.29;   /* "Mt"  */
+    else if ( z == 110)  rcov = 1.28;   /* "Ds"  */
+    else if ( z == 111)  rcov = 1.21;   /* "Rg"  */
+    else if ( z == 112)  rcov = 1.22;   /* "Cn"  */
     else rcov = 1.0;
 
     return rcov /  0.52917720859;

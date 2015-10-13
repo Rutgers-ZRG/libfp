@@ -26,13 +26,13 @@
 
 
 void get_fp_periodic(int lmax, int nat, int ntyp, int types[], double lat[3][3],
-        double rxyz[][3], char *symb[], int natx, double cutoff, double **sfp, double **lfp);
+        double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp, double **lfp);
 
 void get_fp_periodic_short(int lmax, int nat, int ntyp, int types[], double lat[3][3],
-        double rxyz[][3], char *symb[], int natx, double cutoff, double **sfp);
+        double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp);
 
 void get_fp_periodic_long(int lmax, int nat, int ntyp, int types[], double lat[3][3],
-        double rxyz[][3], char *symb[], int natx, double cutoff, double **lfp);
+        double rxyz[][3], int znucl[], int natx, double cutoff, double **lfp);
 
 double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len, 
         double **fp1, double **fp2);

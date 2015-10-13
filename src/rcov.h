@@ -24,5 +24,5 @@
  * THE SOFTWARE.
  * ****************************************************************************/
 
-double get_rcov(char * s);
+double get_rcov(int z);
 

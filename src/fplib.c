@@ -35,7 +35,7 @@
 #include "apc.h"
 
 void get_fp_periodic(int lmax, int nat, int ntyp, int types[], double lat[3][3],
-        double rxyz[][3], char *symb[], int natx, double cutoff, double **sfp, double **lfp)
+        double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp, double **lfp)
 {
     int i, ixyz, flag = 0;
     double rcov[nat];
@@ -52,9 +52,8 @@ void get_fp_periodic(int lmax, int nat, int ntyp, int types[], double lat[3][3],
         exit(1);
     }
 
-    for (i = 0; i < nat; i++){
-        rcov[i] = get_rcov( symb[types[i]-1] );
-    }
+    for (i = 0; i < nat; i++)
+        rcov[i] = get_rcov( znucl[ types[i] - 1 ] );
 
     ixyz = get_ixyz(lat, cutoff);
 
@@ -64,7 +63,7 @@ void get_fp_periodic(int lmax, int nat, int ntyp, int types[], double lat[3][3],
 }
 
 void get_fp_periodic_short(int lmax, int nat, int ntyp, int types[], double lat[3][3],
-        double rxyz[][3], char *symb[], int natx, double cutoff, double **sfp)
+        double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp)
 {
     int i, ixyz, flag = 1;
     double rcov[nat], **lfp;
@@ -82,7 +81,7 @@ void get_fp_periodic_short(int lmax, int nat, int ntyp, int types[], double lat[
     }
 
     for (i = 0; i < nat; i++)
-        rcov[i] = get_rcov( symb[types[i]-1] );
+        rcov[i] = get_rcov( znucl[ types[i] - 1 ] );
 
     ixyz = get_ixyz(lat, cutoff);
 
@@ -91,7 +90,7 @@ void get_fp_periodic_short(int lmax, int nat, int ntyp, int types[], double lat[
 }
 
 void get_fp_periodic_long(int lmax, int nat, int ntyp, int types[], double lat[3][3],
-        double rxyz[][3], char *symb[], int natx, double cutoff, double **lfp)
+        double rxyz[][3], int znucl[], int natx, double cutoff, double **lfp)
 {
     int i, ixyz, flag = -1;
     double rcov[nat], **sfp;
@@ -109,7 +108,7 @@ void get_fp_periodic_long(int lmax, int nat, int ntyp, int types[], double lat[3
     }
 
     for (i = 0; i < nat; i++)
-        rcov[i] = get_rcov( symb[types[i]-1] );
+        rcov[i] = get_rcov( znucl[ types[i] - 1 ] );
 
     ixyz = get_ixyz(lat, cutoff);
 
