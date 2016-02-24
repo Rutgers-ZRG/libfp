@@ -30,9 +30,11 @@
 #include "../src/fplib.h"
 
 static PyObject * get_fppy_periodic(PyObject *self, PyObject *args);
+static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args);
 
 static PyMethodDef functions[] = {
-    {"fp_periodic", get_fppy_periodic, METH_VARARGS, "get finger print" },
+    {"fp_periodic", get_fppy_periodic, METH_VARARGS, "get fingerprint" },
+    {"fp_dist", get_fppy_dist_periodic, METH_VARARGS, "get fingerprint dist"},
     {NULL, NULL, 0, NULL}
 };
 
@@ -119,4 +121,63 @@ static PyObject * get_fppy_periodic(PyObject *self, PyObject *args)
     return array;
 
 }
+
+
+static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args)
+{
+    int i, j, ntyp;
+    double fpdist;
+    PyArrayObject* tfp1;
+    PyArrayObject* tfp2;
+    PyArrayObject* atom_type;
+
+    if (!PyArg_ParseTuple(args, "iOOO", &ntyp, &atom_type, &tfp1, &tfp2))
+        return NULL;
+
+    // double (*
+    int nat = tfp1->dimensions[0];
+    int fp_len = tfp1->dimensions[1];
+    long* typeslong = (long*)atom_type->data;
+    int types[nat];
+    for ( i = 0; i < nat; i++) {
+        types[i] = (int)typeslong[i];
+    }
+
+    double (*fptt1)[fp_len] = (double(*)[fp_len])tfp1->data;
+    double (*fptt2)[fp_len] = (double(*)[fp_len])tfp2->data;
+
+    double **fp1;
+    double **fp2;
+
+    fp1 = (double **) malloc(sizeof(double)*nat);
+    fp2 = (double **) malloc(sizeof(double)*nat);
+    for ( i = 0; i < nat; i++ ) {
+        fp1[i] = (double *) malloc(sizeof(double) * fp_len);
+        fp2[i] = (double *) malloc(sizeof(double) * fp_len);
+    }
+
+
+    for (i = 0; i < nat; i++){
+        for (j = 0; j < fp_len; j++){
+            fp1[i][j] = fptt1[i][j];
+            fp2[i][j] = fptt2[i][j];
+        }
+    }
+
+
+    fpdist = get_fpdistance_periodic(nat, ntyp, types, fp_len, fp1, fp2);
+
+    free(fp1);
+    free(fp2);
+
+    // printf("%d %d \n ", nat, nat2);
+    return PyFloat_FromDouble(fpdist);
+
+}
+
+
+
+
+
+
 
