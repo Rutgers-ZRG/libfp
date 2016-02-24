@@ -148,15 +148,11 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
         for (ii = 0; ii < i; ii++)
             for (jj = 0; jj < i; jj++)
                 a[ii*i + jj] = costmp[ii][jj];
-       apc(i, a, &cc, f);
-//       printf("ityp %d\n", ityp);
-//       for (ii = 0; ii< i; ii++)
-//           printf("%d ", f[ii]);
-//       printf("\n");
+        apc(i, a, &cc, f);
 
-       free(f);
-       free(a);
-       fpd += (cc/i);
+        free(f);
+        free(a);
+        fpd += (cc/i);
 
     }
     fpd /= ntyp;
