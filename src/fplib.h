@@ -35,5 +35,5 @@ void get_fp_periodic_long(int lmax, int nat, int ntyp, int types[], double lat[3
         double rxyz[][3], int znucl[], int natx, double cutoff, double **lfp);
 
 double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len, 
-        double **fp1, double **fp2);
+        double **fp1, double **fp2, int f[]);
 

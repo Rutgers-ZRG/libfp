@@ -130,6 +130,8 @@ static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args)
     PyArrayObject* tfp1;
     PyArrayObject* tfp2;
     PyArrayObject* atom_type;
+    PyObject* array;
+    PyObject* farray;
 
     if (!PyArg_ParseTuple(args, "iOOO", &ntyp, &atom_type, &tfp1, &tfp2))
         return NULL;
@@ -138,10 +140,11 @@ static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args)
     int nat = tfp1->dimensions[0];
     int fp_len = tfp1->dimensions[1];
     long* typeslong = (long*)atom_type->data;
-    int types[nat];
+    int types[nat], f[nat];
     for ( i = 0; i < nat; i++) {
         types[i] = (int)typeslong[i];
     }
+
 
     double (*fptt1)[fp_len] = (double(*)[fp_len])tfp1->data;
     double (*fptt2)[fp_len] = (double(*)[fp_len])tfp2->data;
@@ -151,6 +154,7 @@ static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args)
 
     fp1 = (double **) malloc(sizeof(double)*nat);
     fp2 = (double **) malloc(sizeof(double)*nat);
+
     for ( i = 0; i < nat; i++ ) {
         fp1[i] = (double *) malloc(sizeof(double) * fp_len);
         fp2[i] = (double *) malloc(sizeof(double) * fp_len);
@@ -165,13 +169,22 @@ static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args)
     }
 
 
-    fpdist = get_fpdistance_periodic(nat, ntyp, types, fp_len, fp1, fp2);
+    fpdist = get_fpdistance_periodic(nat, ntyp, types, fp_len, fp1, fp2, f);
 
     free(fp1);
     free(fp2);
 
+    farray = PyList_New(0);
+    for (i = 0; i < nat; i++){
+        PyList_Append(farray, PyInt_FromLong( (long)f[i] ));
+    }
+
+    array = PyList_New(0);
+    PyList_Append( array, PyFloat_FromDouble(fpdist));
+    PyList_Append( array, farray);
+
     // printf("%d %d \n ", nat, nat2);
-    return PyFloat_FromDouble(fpdist);
+    return array;
 
 }
 

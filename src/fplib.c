@@ -117,12 +117,13 @@ void get_fp_periodic_long(int lmax, int nat, int ntyp, int types[], double lat[3
 }
 
 double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len, 
-        double **fp1, double **fp2)
+        double **fp1, double **fp2, int f[])
 {
     double fpd, cc, tt, costmp[nat][nat], *a;
-    int iat, jat, ityp, i, j, k, ii, jj, *f;
+    int iat, jat, ityp, i, j, k, ii, jj, inat, *ft;
 
     fpd = 0.0;
+    inat = 0;
 
     for (ityp = 1; ityp <= ntyp; ityp++) {
         i = 0;
@@ -136,26 +137,31 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
                         tt = 0.0;
                         for (k = 0; k < fp_len; k++)
                             tt += (fp1[iat][k] - fp2[jat][k]) * (fp1[iat][k] - fp2[jat][k]); 
-                        costmp[i-1][j-1] = tt;
+                        costmp[i-1][j-1] = sqrt(tt);
                     }
                 }
             }
         }
-        f = (int *) malloc(sizeof(int)*i);
+        ft = (int *) malloc(sizeof(int)*i);
         a = (double *) malloc(sizeof(double)*i*i);
         //printf("nt %d %d\n", i,j);
        
         for (ii = 0; ii < i; ii++)
             for (jj = 0; jj < i; jj++)
                 a[ii*i + jj] = costmp[ii][jj];
-        apc(i, a, &cc, f);
+        apc(i, a, &cc, ft);
 
-        free(f);
+        for (k = 0; k < i; k++){
+            f[inat] = ft[k];
+            inat++;
+        }
+
+        free(ft);
         free(a);
-        fpd += (cc/i);
+        fpd += cc;
 
     }
-    fpd /= ntyp;
+    fpd /= sqrt(nat);
 
     return fpd;
 }
