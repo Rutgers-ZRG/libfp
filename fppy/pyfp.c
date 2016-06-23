@@ -1,7 +1,7 @@
 /*******************************************************************************
- * Copyright (C) 2015 Li Zhu 
- * All rights reserved. 
- * 
+ * Copyright (C) 2015 Li Zhu
+ * All rights reserved.
+ *
  * pyfp.c
  * This file is part of fplib.
  *
@@ -11,10 +11,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -55,7 +55,7 @@ static PyObject * get_fppy_periodic(PyObject *self, PyObject *args)
     PyArrayObject* znu;
     PyObject* array, *vec, *shortfp, *longfp;
 
-    if (!PyArg_ParseTuple(args, "OOOOiid", &lattice, &position, &atom_type, &znu, 
+    if (!PyArg_ParseTuple(args, "OOOOiid", &lattice, &position, &atom_type, &znu,
                 &lmax, &natx, &cutoff))
         return NULL;
 
@@ -106,7 +106,7 @@ static PyObject * get_fppy_periodic(PyObject *self, PyObject *args)
         }
         PyList_Append( longfp, vec);
     }
-    
+
     array = PyList_New(0);
     PyList_Append( array, shortfp );
     PyList_Append( array, longfp );
@@ -170,6 +170,11 @@ static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args)
 
 
     fpdist = get_fpdistance_periodic(nat, ntyp, types, fp_len, fp1, fp2, f);
+
+    for ( i = 0; i < nat; i++) {
+        free(fp1[i]);
+        free(fp2[i]);
+    }
 
     free(fp1);
     free(fp2);
