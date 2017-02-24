@@ -158,6 +158,8 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
 
         free(ft);
         free(a);
+        ft = NULL;
+        a = NULL;
         fpd += cc;
 
     }
