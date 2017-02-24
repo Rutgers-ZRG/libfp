@@ -1,7 +1,7 @@
 /*******************************************************************************
- * Copyright (C) 2015 Li Zhu 
- * All rights reserved. 
- * 
+ * Copyright (C) 2015 Li Zhu
+ * All rights reserved.
+ *
  * fplib.c
  * This file is part of fplib.
  *
@@ -11,10 +11,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -116,7 +116,7 @@ void get_fp_periodic_long(int lmax, int nat, int ntyp, int types[], double lat[3
     get_fp(flag, nat, ntyp, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp);
 }
 
-double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len, 
+double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
         double **fp1, double **fp2, int f[])
 {
     double fpd, cc, tt, costmp[nat][nat], *a;
@@ -136,7 +136,7 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
                         j++;
                         tt = 0.0;
                         for (k = 0; k < fp_len; k++)
-                            tt += (fp1[iat][k] - fp2[jat][k]) * (fp1[iat][k] - fp2[jat][k]); 
+                            tt += (fp1[iat][k] - fp2[jat][k]) * (fp1[iat][k] - fp2[jat][k]);
                         costmp[i-1][j-1] = sqrt(tt);
                     }
                 }
@@ -145,7 +145,7 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
         ft = (int *) malloc(sizeof(int)*i);
         a = (double *) malloc(sizeof(double)*i*i);
         //printf("nt %d %d\n", i,j);
-       
+
         for (ii = 0; ii < i; ii++)
             for (jj = 0; jj < i; jj++)
                 a[ii*i + jj] = costmp[ii][jj];
@@ -158,6 +158,8 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
 
         free(ft);
         free(a);
+        ft = NULL;
+        a = NULL;
         fpd += cc;
 
     }

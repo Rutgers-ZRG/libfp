@@ -1,16 +1,16 @@
 /*******************************************************************************
- * 
+ *
  * apc.c
  * This file is part of fplib.
  *
- * SOLUTION OF THE LINEAR MIN-SUM ASSIGNMENT PROBLEM.  
+ * SOLUTION OF THE LINEAR MIN-SUM ASSIGNMENT PROBLEM.
  * HUNGARIAN METHOD. COMPLEXITY O(n^3).
  *
  * October 2008:
- * - Original FORTRAN code translated in C LANGUAGE by Andrea Tramontani 
- *   Andrea Tramontani 
- *   DEIS, University of Bologna 
- *   Viale Risorgimento, 2 
+ * - Original FORTRAN code translated in C LANGUAGE by Andrea Tramontani
+ *   Andrea Tramontani
+ *   DEIS, University of Bologna
+ *   Viale Risorgimento, 2
  *   40136 - Bologna (Italy)
  *
  * October 2015:
@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void init(int n, double *a, int *f, double *u, double *v, int *fb, int *p, 
+void init(int n, double *a, int *f, double *u, double *v, int *fb, int *p,
         double INF, int *m_p);
 void path(int n, double *a, int *f, double *u, double *v, int *fb, int *rc,
         double *pi, int *lr, int *uc, double INF, int ii, int *jj_p);
@@ -30,24 +30,24 @@ void incr(int *f,int *fb,int *rc,int j);
 
 /*
 
-   SOLUTION OF THE LINEAR MIN-SUM ASSIGNMENT PROBLEM. 
+   SOLUTION OF THE LINEAR MIN-SUM ASSIGNMENT PROBLEM.
 
    HUNGARIAN METHOD. COMPLEXITY O(n^3).
 
 
-   MEANING OF THE INPUT PARAMETERS:          
-   n       = NUMBER OF ROWS AND COLUMNS OF THE COST MATRIX.     
-   a[i][j] = COST OF THE ASSIGNMENT OF ROW  i  TO COLUMN  j .   
-   INF     = A VERY LARGE INTEGER VALUE, SETTED BY THE USER ACCORDING 
+   MEANING OF THE INPUT PARAMETERS:
+   n       = NUMBER OF ROWS AND COLUMNS OF THE COST MATRIX.
+   a[i][j] = COST OF THE ASSIGNMENT OF ROW  i  TO COLUMN  j .
+   INF     = A VERY LARGE INTEGER VALUE, SETTED BY THE USER ACCORDING
              TO THE CHARACTERISTICS OF THE USED MACHINE.
-   INF IS THE ONLY MACHINE-DEPENDENT CONSTANT USED AND IT MUST BE STRICTLY GREATER THAN THE MAXIMUM 
+   INF IS THE ONLY MACHINE-DEPENDENT CONSTANT USED AND IT MUST BE STRICTLY GREATER THAN THE MAXIMUM
    ASSIGNMENT COST (E.G., INF MUST BE STRICTLY GREATER THAN THE MAXIMUM VALUE OF THE COST MATRIX a).
-   ON RETURN, THE INPUT PARAMETERS ARE UNCHANGED.              
+   ON RETURN, THE INPUT PARAMETERS ARE UNCHANGED.
 
-   MEANING OF THE OUTPUT PARAMETERS:       
-   f[i] = COLUMN ASSIGNED TO ROW  i .        
-   z_p  = COST OF THE OPTIMAL ASSIGNMENT =   
-   = a[0][f[0]] + a[1][f[1]] + ... + a[n-1][f[n-1]] .  
+   MEANING OF THE OUTPUT PARAMETERS:
+   f[i] = COLUMN ASSIGNED TO ROW  i .
+   z_p  = COST OF THE OPTIMAL ASSIGNMENT =
+   = a[0][f[0]] + a[1][f[1]] + ... + a[n-1][f[n-1]] .
 
    RETURN VALUE:
    0,  IF THE PROBLEM HAS BEEN SOLVED AND THE OUTPUT PARAMETERS HAVE BEEN PROPERLY SETTED
@@ -55,11 +55,11 @@ void incr(int *f,int *fb,int *rc,int j);
 
    ALL THE PARAMETERS ARE INTEGERS.
    VECTOR  f  MUST BE DIMENSIONED AT LEAST AT  n , MATRIX  a
-   AT LEAST AT  (n,n) . 
+   AT LEAST AT  (n,n) .
 
-   THE CODE IS BASED ON THE HUNGARIAN METHOD AS DESCRIBED BY   
+   THE CODE IS BASED ON THE HUNGARIAN METHOD AS DESCRIBED BY
    LAWLER (COMBINATORIAL OPTIMIZATION : NETWORKS AND
-   MATROIDS, HOLT, RINEHART AND WINSTON, NEW YORK, 1976).            
+   MATROIDS, HOLT, RINEHART AND WINSTON, NEW YORK, 1976).
    THE ALGORITHMIC PASCAL-LIKE DESCRIPTION OF THE CODE IS
    GIVEN IN G.CARPANETO, S.MARTELLO AND P.TOTH, ALGORITHMS AND
    CODES FOR THE ASSIGNMENT PROBLEM, ANNALS OF OPERATIONS
@@ -69,8 +69,8 @@ void incr(int *f,int *fb,int *rc,int j);
    PRIMAL SOLUTIONS AND THEN SEARCHES FOR AUGMENTING PATHS
    UNTIL ALL ROWS AND COLUMNS ARE ASSIGNED.
 
-   MEANING OF THE MAIN INTERNAL VARIABLES:   
-   fb[j] = ROW ASSIGNED TO COLUMN  j . 
+   MEANING OF THE MAIN INTERNAL VARIABLES:
+   fb[j] = ROW ASSIGNED TO COLUMN  j .
    m     = NUMBER OF INITIAL ASSIGNMENTS.
    u[i]  = DUAL VARIABLE ASSOCIATED WITH ROW  i .
    v[j]  = DUAL VARIABLE ASSOCIATED WITH COLUMN  j .
@@ -85,7 +85,7 @@ void incr(int *f,int *fb,int *rc,int j);
    UNIVERSITA' DI BOLOGNA, VIALE RISORGIMENTO 2
    40136 BOLOGNA (ITALY)
 
-   THIS WORK WAS SUPPORTED BY  C.N.R. , ITALY.                 
+   THIS WORK WAS SUPPORTED BY  C.N.R. , ITALY.
 
 */
 int apc(int n, double *a, double *z_p, int *f)
@@ -108,42 +108,48 @@ int apc(int n, double *a, double *z_p, int *f)
     if(v==NULL)
     {
         free(u);
+        u = NULL;
         return -1;
     }
     fb=(int*)malloc(n*sizeof(int));
     if(fb==NULL)
     {
         free(u); free(v);
+        u = NULL; v = NULL;
         return -1;
     }
     rc=(int*)malloc(n*sizeof(int));
     if(rc==NULL)
     {
         free(u); free(v); free(fb);
+        u = NULL; v = NULL; fb = NULL;
         return -1;
     }
     pi=(double*)malloc(n*sizeof(double));
     if(pi==NULL)
     {
         free(u); free(v); free(fb); free(rc);
+        u = NULL; v = NULL; fb = NULL; rc = NULL;
         return -1;
     }
     lr=(int*)malloc(n*sizeof(int));
     if(lr==NULL)
     {
         free(u); free(v); free(fb); free(rc); free(pi);
+        u = NULL; v = NULL; fb = NULL; rc = NULL; pi = NULL;
         return -1;
     }
     uc=(int*)malloc(n*sizeof(int));
     if(uc==NULL)
     {
         free(u); free(v); free(fb); free(rc); free(pi); free(lr);
+        u = NULL; v = NULL; fb = NULL; rc = NULL; pi = NULL; lr = NULL;
         return -1;
     }
 
     //SEARCH FOR THE INITIAL DUAL AND PARTIAL PRIMAL SOLUTIONS.
     init(n,a,f,u,v,fb,rc,INF,&m);
-    //SOLUTION OF THE REDUCED PROBLEM.	
+    //SOLUTION OF THE REDUCED PROBLEM.
     if(m!=n)
     {
         for(i=0;i<n;i++)
@@ -166,6 +172,7 @@ int apc(int n, double *a, double *z_p, int *f)
 
     //Free all the allocated memory and return
     free(u); free(v); free(fb); free(rc); free(pi); free(lr); free(uc);
+    u = NULL; v = NULL; fb = NULL; rc = NULL; pi = NULL; lr = NULL; uc = NULL;
 
     return 0;
 
@@ -173,10 +180,10 @@ int apc(int n, double *a, double *z_p, int *f)
 
 
 /*
-   ASSIGNMENT OF COLUMN  j .                 
+   ASSIGNMENT OF COLUMN  j .
    */
 void incr(int *f,int *fb,int *rc,int j)
-{	
+{
     int i,jj;
 
     do
@@ -189,12 +196,12 @@ void incr(int *f,int *fb,int *rc,int j)
 
 
 
-/*      
+/*
         SEARCH FOR THE INITIAL DUAL AND PARTIAL PRIMAL SOLUTIONS.
         p[i] = FIRST UNSCANNED COLUMN OF ROW  i .
         */
 void init(int n,double *a,int *f,double *u,double *v,int *fb,int *p,double INF,int *m_p)
-{	
+{
 
     int i,j,jmin,k,kk,r,m,skip;
     double ia, min;
@@ -306,7 +313,7 @@ void init(int n,double *a,int *f,double *u,double *v,int *fb,int *p,double INF,i
    uc[l] = l-TH UNLABELLED COLUMN ( l=0,nuc-1 ).
    */
 void path(int n,double *a,int *f,double *u,double *v,int *fb,int *rc,double *pi,int *lr,int *uc,double INF,int ii,int *jj_p)
-{	
+{
 
     int k,j,jj,l,r,nuc,nlr;
     double ia, min;
@@ -318,13 +325,13 @@ void path(int n,double *a,int *f,double *u,double *v,int *fb,int *rc,double *pi,
         pi[k]=a[ii*n+k]-u[ii]-v[k];
         rc[k]=ii; uc[k]=k;
     }
-    nuc=n; nlr=1; 
+    nuc=n; nlr=1;
     goto L40;
 
-    //SCANNING OF THE LABELLED ROWS.          
-L20:	
+    //SCANNING OF THE LABELLED ROWS.
+L20:
     r=lr[nlr-1];
-    for(l=0;l<nuc;l++) 
+    for(l=0;l<nuc;l++)
     {
         j=uc[l];
         ia=a[r*n+j]-u[r]-v[j];
@@ -334,22 +341,22 @@ L20:
         }
     }
 
-    //SEARCH FOR A ZERO ELEMENT IN AN UNLABELLED COLUMN.         
-L40:	
-    for(l=0;l<nuc;l++) 
+    //SEARCH FOR A ZERO ELEMENT IN AN UNLABELLED COLUMN.
+L40:
+    for(l=0;l<nuc;l++)
     {
         j=uc[l];
         if(pi[j]==0) goto L100;
     }
 
-    //UPDATING OF THE DUAL VARIABLES  U(I)  AND  V(J) .              
+    //UPDATING OF THE DUAL VARIABLES  U(I)  AND  V(J) .
     min=INF;
-    for(l=0;l<nuc;l++) 
+    for(l=0;l<nuc;l++)
     {
         j=uc[l];
         if(min > pi[j]) min=pi[j];
     }
-    for(l=0;l<nlr;l++) 
+    for(l=0;l<nlr;l++)
     {
         r=lr[l];
         u[r]+=min;
@@ -367,14 +374,14 @@ L40:
     }
     goto L40;
 
-L100:	
+L100:
     if(fb[j]<0) goto L110;
 
     //LABELLING OF ROW  FB(J)  AND REMOVAL OF THE LABEL  OF COLUMN  J .
     nlr++; lr[nlr-1]=fb[j]; uc[l]=uc[nuc-1]; nuc--; goto L20;
 
     //DETERMINATION OF THE UNASSIGNED COLUMN  J .
-L110:	
+L110:
     jj=j;
 
 
