@@ -232,6 +232,7 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
         }
 
         free(work);
+        work = NULL;
         for (i = 0; i < n_sphere; i++)
             free(om[i]);
             om[i] = NULL;
