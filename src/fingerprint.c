@@ -172,9 +172,6 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
         free(a);
         free(work);
 
-        w = NULL;
-        a = NULL;
-        work = NULL;
 
         if (flag >= 0 ){
             /* contract */
@@ -227,19 +224,13 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
 
             free(a);
             free(w);
-            a = NULL;
-            w = NULL;
         }
 
         free(work);
         for (i = 0; i < n_sphere; i++)
             free(om[i]);
-            om[i] = NULL;
         free(om);
-        om = NULL;
         free(pvec);
-        pvec = NULL;
-
 
     }
     printf("min  %d, max  %d\n", n_sphere_min, n_sphere_max);
