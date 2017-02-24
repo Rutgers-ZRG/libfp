@@ -1,7 +1,7 @@
 /*******************************************************************************
- * Copyright (C) 2015 Li Zhu 
- * All rights reserved. 
- * 
+ * Copyright (C) 2015 Li Zhu
+ * All rights reserved.
+ *
  * fingerprint.c
  * This file is part of fplib.
  *
@@ -11,10 +11,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -172,6 +172,9 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
         free(a);
         free(work);
 
+        w = NULL;
+        a = NULL;
+        work = NULL;
 
         if (flag >= 0 ){
             /* contract */
@@ -195,7 +198,7 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
 
             if ( (w = (double *) malloc(sizeof(double)*nids)) == NULL) {
                 fprintf(stderr, "Memory could not be allocated.");
-                exit(1);} 
+                exit(1);}
 
             for (i = 0; i < nids; i++){
                 for (j = 0; j< nids; j++){
@@ -203,14 +206,14 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
                 }
             }
 
-            
+
             lda = nids;
             lwork = -1;
             dsyev("V", "U", &nids, a, &lda, w, &wkopt, &lwork, &info);
             lwork = (int)wkopt;
             work = (double*) malloc(lwork*sizeof(double));
             dsyev("V", "U", &nids, a, &lda, w, work, &lwork, &info);
-            
+
 
             for (i = 0; i < nids; i++)
                 sfp[iat][i] = w[nids-1-i];
@@ -224,20 +227,25 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
 
             free(a);
             free(w);
+            a = NULL;
+            w = NULL;
         }
 
         free(work);
         for (i = 0; i < n_sphere; i++)
             free(om[i]);
+            om[i] = NULL;
         free(om);
+        om = NULL;
         free(pvec);
+        pvec = NULL;
 
 
     }
     printf("min  %d, max  %d\n", n_sphere_min, n_sphere_max);
 }
 
-void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_sphere[], 
+void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_sphere[],
         double amp[], double **om)
 {
 
@@ -348,6 +356,7 @@ int get_ixyz(double lat[3][3], double cutoff)
     ixyz = (int)(sqrt(1.0/w[0])*cutoff + 1);
 
     free(work);
+    work = NULL;
 
     return ixyz;
 }

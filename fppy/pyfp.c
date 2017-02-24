@@ -114,9 +114,13 @@ static PyObject * get_fppy_periodic(PyObject *self, PyObject *args)
     for (i = 0; i < nat; i++) {
         free(sfp[i]);
         free(lfp[i]);
+        sfp[i] = NULL;
+        lfp[i] = NULL;
     }
     free(sfp);
     free(lfp);
+    sfp = NULL;
+    lfp = NULL;
 
     return array;
 
@@ -174,10 +178,14 @@ static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args)
     for ( i = 0; i < nat; i++) {
         free(fp1[i]);
         free(fp2[i]);
+        fp1[i] = NULL;
+        fp2[i] = NULL;
     }
 
     free(fp1);
     free(fp2);
+    fp1 = NULL;
+    fp2 = NULL;
 
     farray = PyList_New(0);
     for (i = 0; i < nat; i++){
