@@ -196,6 +196,8 @@ static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args)
     PyList_Append( array, PyFloat_FromDouble(fpdist));
     PyList_Append( array, farray);
 
+    Py_DECREF(farray);
+
     // printf("%d %d \n ", nat, nat2);
     return array;
 
