@@ -25,6 +25,8 @@
  * ****************************************************************************/
 
 
+void get_fp_nonperiodic(int nid, int nat, int ntyp, int types[], double rxyz[][3], int znucl[], double fp[]);
+
 void get_fp_periodic(int lmax, int nat, int ntyp, int types[], double lat[3][3],
         double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp, double **lfp);
 

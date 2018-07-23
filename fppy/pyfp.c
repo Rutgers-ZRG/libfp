@@ -29,10 +29,12 @@
 #include <numpy/arrayobject.h>
 #include "../src/fplib.h"
 
+static PyObject * get_fppy_nonperiodic(PyObject *self, PyObject *args);
 static PyObject * get_fppy_periodic(PyObject *self, PyObject *args);
 static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args);
 
 static PyMethodDef functions[] = {
+    {"fp_nonperiodic", get_fppy_nonperiodic, METH_VARARGS, "get fingerprint non" },
     {"fp_periodic", get_fppy_periodic, METH_VARARGS, "get fingerprint" },
     {"fp_dist", get_fppy_dist_periodic, METH_VARARGS, "get fingerprint dist"},
     {NULL, NULL, 0, NULL}
@@ -42,6 +44,46 @@ PyMODINIT_FUNC initfppy(void)
 {
     Py_InitModule3("fppy", functions, "C-extension for fplib\n\n...\n");
     return ;
+}
+
+
+static PyObject * get_fppy_nonperiodic(PyObject *self, PyObject *args)
+{
+    int i, lseg, nid;
+    double *fp;
+    PyArrayObject* position;
+    PyArrayObject* atom_type;
+    PyArrayObject* znu;
+    PyObject* vec;
+
+    if (!PyArg_ParseTuple(args, "OOO", &position, &atom_type, &znu))
+        return NULL;
+
+    double (*rxyz)[3] = (double(*)[3])position->data;
+    int nat = position->dimensions[0];
+    int ntyp = znu->dimensions[0];
+    long* znuclong = (long*)znu->data;
+    long* typeslong = (long*)atom_type->data;
+
+    int types[nat];
+    for (i = 0; i < nat; i++)
+        types[i] = (int)typeslong[i];
+    int znucl[ntyp];
+    for (i = 0; i < ntyp; i++)
+        znucl[i] = (int)znuclong[i];
+    lseg = 4;
+    nid = nat * lseg;
+    fp = (double *) malloc(sizeof(double)*nid);
+
+    get_fp_nonperiodic(nid, nat, ntyp, types, rxyz, znucl, fp);
+    vec = PyList_New(0);
+    for (i = 0; i < nid; i++) {
+        PyList_Append(vec, PyFloat_FromDouble( fp[i] ));
+    }
+    free(fp);
+
+    return vec;
+       
 }
 
 static PyObject * get_fppy_periodic(PyObject *self, PyObject *args)

@@ -34,6 +34,73 @@
 #include "fingerprint.h"
 #include "apc.h"
 
+
+void get_fp_nonperiodic(int nid, int nat, int ntyp, int types[], double rxyz[][3], int znucl[], double fp[])
+{
+    
+    int i, j;
+    int lwork, lda, info;
+    //double om[nid][nid];
+    double **om;
+    double amp[nat];
+    double a[nid*nid];
+    double w[nid];
+    double wkopt;
+    double *work;
+    double rcov[nat];
+
+
+    for (i = 0; i < nat; i++)
+        rcov[i] = get_rcov( znucl[ types[i] - 1 ] );
+
+    for (i = 0; i < nat; i++)
+        amp[i] = 1.0;
+
+    nid = 4 * nat;
+
+            if ( (om = (double **) malloc(sizeof(double)*nid)) == NULL) {
+            fprintf(stderr, "Memory could not be allocated.");
+            exit(1);
+        }
+        for (i = 0; i < nid; i++){
+            if ( (om[i] = (double *) malloc(sizeof(double)*nid)) == NULL) {
+                fprintf(stderr, "Memory could not be allocated.");
+                exit(1);
+            }
+        }
+    creat_om(4, nat, rxyz, rcov, amp, om);
+
+    for (i = 0; i < nid; i++)
+        for (j = 0; j< nid; j++)
+            a[i*nid + j] = om[j][i];
+
+    lda = nid;
+    lwork = -1;
+    dsyev("V", "U", &nid, a, &lda, w, &wkopt, &lwork, &info);
+    lwork = (int)wkopt;
+    work = (double*) malloc(lwork*sizeof(double));
+    dsyev("V", "U", &nid, a, &lda, w, work, &lwork, &info);
+    if (info > 0 ) {
+        fprintf(stderr, "Error: DSYEV 1");
+        exit(1); }
+    if (w[0] < -1E-12) {
+        printf("w[0] = %g\n", w[0]);
+        fprintf(stderr, "Error: Negative w");
+        exit(1); }
+
+    for (i = 0; i < nid; i++)
+        fp[i] = w[nid-1-i];
+
+    free(work);
+            for (i = 0; i < nid; i++)
+            free(om[i]);
+        free(om);
+
+
+}
+
+
+
 void get_fp_periodic(int lmax, int nat, int ntyp, int types[], double lat[3][3],
         double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp, double **lfp)
 {
