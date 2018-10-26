@@ -1,2 +1,2 @@
 # fplib
-a fingerprint library 
+A fingerprint based metric for measuring similarities of crystalline structures
