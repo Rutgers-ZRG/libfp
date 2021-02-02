@@ -30,7 +30,14 @@
 #include <math.h>
 #include "fingerprint.h"
 
-void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, double lat[3][3],
+
+extern void dsyev_( char* jobz, char* uplo, int* n, double* a, int* lda,
+                double* w, double* work, int* lwork, int* info );
+
+extern void dsygv_(int* itype, char* jobz, char* uplo, int* n, double* a,
+                int* lda, double* b, int* ldb, double* w, double* work, int* lwork, int* info);
+
+void get_fp(int flag, int log, int nat, int ntyp, int ixyz, int nx, int lseg, int l, double lat[3][3],
         double rxyz[][3], int types[], double rcov[], double cutoff, double **lfp, double **sfp)
 {
     int iat, jat, ix, iy, iz, il, i, j;
@@ -51,7 +58,6 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
     int lda, info, lwork;
     double wkopt;
     double *work, *w, *a;
-
 
     wc = cutoff / sqrt(2.0 * NC);
     fc = 1.0 / (2.0 * NC * wc * wc);
@@ -143,37 +149,34 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
         lda = nid;
         lwork = -1;
 
-        /// for (i = 0; i< nid*nid; i++)
-        ///     printf("a[%d]= %g\n", i, a[i]);
 
-        dsyev("V", "U", &nid, a, &lda, w, &wkopt, &lwork, &info);
+        dsyev_("V", "U", &nid, a, &lda, w, &wkopt, &lwork, &info);
         lwork = (int)wkopt;
         work = (double*) malloc(lwork*sizeof(double));
-        dsyev("V", "U", &nid, a, &lda, w, work, &lwork, &info);
+        dsyev_("V", "U", &nid, a, &lda, w, work, &lwork, &info);
         if (info > 0 ) {
             fprintf(stderr, "Error: DSYEV 1");
             exit(1); }
         if (w[0] < -1E-12) {
-            printf("w[0] = %g\n", w[0]);
             fprintf(stderr, "Error: Negative w");
             exit(1); }
 
         for (i = 0; i < nid; i++)
             pvec[i] = a[i + (nid-1)*nid];
 
-        if (flag <= 0 ) {
-            for (i = 0; i < nid; i++)
-                lfp[iat][i] = w[nid-1-i];
-            for (i = nid; i < nx; i++)
-                lfp[iat][i] = 0.0;
-        }
+
+        for (i = 0; i < nid; i++)
+            lfp[iat][i] = w[nid-1-i];
+        for (i = nid; i < nx; i++)
+            lfp[iat][i] = 0.0;
+
 
         free(w);
         free(a);
         free(work);
 
 
-        if (flag >= 0 ){
+        if (flag > 0 ){
             /* contract */
             nids = l*(ntyp+1);
 
@@ -206,10 +209,10 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
 
             lda = nids;
             lwork = -1;
-            dsyev("V", "U", &nids, a, &lda, w, &wkopt, &lwork, &info);
+            dsyev_("V", "U", &nids, a, &lda, w, &wkopt, &lwork, &info);
             lwork = (int)wkopt;
             work = (double*) malloc(lwork*sizeof(double));
-            dsyev("V", "U", &nids, a, &lda, w, work, &lwork, &info);
+            dsyev_("V", "U", &nids, a, &lda, w, work, &lwork, &info);
 
 
             for (i = 0; i < nids; i++)
@@ -224,9 +227,10 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
 
             free(a);
             free(w);
+            free(work);
         }
 
-        free(work);
+        
         work = NULL;
         for (i = 0; i < nid; i++)
             free(om[i]);
@@ -234,7 +238,8 @@ void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, doub
         free(pvec);
 
     }
-    printf("min  %d, max  %d\n", n_sphere_min, n_sphere_max);
+    if (log > 0)
+        printf("min  %d, max  %d\n", n_sphere_min, n_sphere_max);
 }
 
 void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_sphere[],
@@ -250,6 +255,7 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
             xi = rxyz_sphere[iat][0];
             yi = rxyz_sphere[iat][1];
             zi = rxyz_sphere[iat][2];
+            // printf("%g %g %g\n", xi, yi, zi);
 
             for (jat = 0; jat < n_sphere; jat++) {
                 xj = rxyz_sphere[jat][0];
@@ -310,12 +316,15 @@ void creat_om(int lseg, int n_sphere, double rxyz_sphere[][3], double rcov_spher
 
     for (i = 0; i < lseg*n_sphere; i++){
         for (j = 0; j< lseg*n_sphere; j++){
+            // printf("%g  ", om[i][j]);
             if (fabs(om[i][j] - om[j][i]) > 1e-6) {
                 printf("OM SYMMETRY ERROR\n");
                 printf("OM[%d][%d]=%g, OM[%d][%d]=%g\n", i, j, om[i][j], j, i, om[j][i]);
             }
         }
+        // printf("\n");
     }
+    // printf ("ENDOM\n");
 
 }
 
@@ -336,10 +345,10 @@ int get_ixyz(double lat[3][3], double cutoff)
         for (j = 0; j < 3; j++)
             a[i*3+j] = lat2[j][i];
 
-    dsyev("V", "U", &n, a, &lda, w, &wkopt, &lwork, &info);
+    dsyev_("V", "U", &n, a, &lda, w, &wkopt, &lwork, &info);
     lwork = (int)wkopt;
     work = (double*) malloc(lwork*sizeof(double));
-    dsyev("V", "U", &n, a, &lda, w, work, &lwork, &info);
+    dsyev_("V", "U", &n, a, &lda, w, work, &lwork, &info);
     if (info > 0 ) {
         fprintf(stderr, "Error: DSYEV ixyz");
         exit(1);

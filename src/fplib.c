@@ -33,6 +33,29 @@
 #include "rcov.h"
 #include "fingerprint.h"
 #include "apc.h"
+#include "version.h"
+
+extern void dsyev_( char* jobz, char* uplo, int* n, double* a, int* lda,
+                        double* w, double* work, int* lwork, int* info );
+
+/*-----------------------------------------*/
+/* Version: fplib-[major].[minor].[micro] */
+/*-----------------------------------------*/
+int get_major_version(void)
+{
+  return FPLIB_MAJOR_VERSION;
+}
+
+int get_minor_version(void)
+{
+  return FPLIB_MINOR_VERSION;
+}
+
+int get_micro_version(void)
+{
+  return FPLIB_MICRO_VERSION;
+}
+
 
 
 void get_fp_nonperiodic(int nid, int nat, int ntyp, int types[], double rxyz[][3], int znucl[], double fp[])
@@ -76,10 +99,10 @@ void get_fp_nonperiodic(int nid, int nat, int ntyp, int types[], double rxyz[][3
 
     lda = nid;
     lwork = -1;
-    dsyev("V", "U", &nid, a, &lda, w, &wkopt, &lwork, &info);
+    dsyev_("V", "U", &nid, a, &lda, w, &wkopt, &lwork, &info);
     lwork = (int)wkopt;
     work = (double*) malloc(lwork*sizeof(double));
-    dsyev("V", "U", &nid, a, &lda, w, work, &lwork, &info);
+    dsyev_("V", "U", &nid, a, &lda, w, work, &lwork, &info);
     if (info > 0 ) {
         fprintf(stderr, "Error: DSYEV 1");
         exit(1); }
@@ -101,10 +124,10 @@ void get_fp_nonperiodic(int nid, int nat, int ntyp, int types[], double rxyz[][3
 
 
 
-void get_fp_periodic(int lmax, int nat, int ntyp, int types[], double lat[3][3],
+void get_fp_periodic(int flag, int log, int lmax, int nat, int ntyp, int types[], double lat[3][3],
         double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp, double **lfp)
 {
-    int i, ixyz, flag = 0;
+    int i, ixyz;
     double rcov[nat];
     int lseg, l;
 
@@ -124,63 +147,9 @@ void get_fp_periodic(int lmax, int nat, int ntyp, int types[], double lat[3][3],
 
     ixyz = get_ixyz(lat, cutoff);
 
-    /* flag < 0: long fp only;  == 0: short fp only; > 0: long and short fp */
-    get_fp(flag, nat, ntyp, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp);
+    /* flag = 0: long fp only;  = 1: long and short fp */
+    get_fp(flag, log, nat, ntyp, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp);
 
-}
-
-void get_fp_periodic_short(int lmax, int nat, int ntyp, int types[], double lat[3][3],
-        double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp)
-{
-    int i, ixyz, flag = 1;
-    double rcov[nat], **lfp = NULL;
-    int lseg, l;
-
-    if (lmax == 0){
-        lseg = 1;
-        l = 1;
-    }else if (lmax == 1){
-        lseg = 4;
-        l = 2;
-    }else {
-        fprintf(stderr, "Error: ORBITAL.");
-        exit(1);
-    }
-
-    for (i = 0; i < nat; i++)
-        rcov[i] = get_rcov( znucl[ types[i] - 1 ] );
-
-    ixyz = get_ixyz(lat, cutoff);
-
-    /* flag < 0: long fp only; > 0 short fp only; == 0: long and short fp */
-    get_fp(flag, nat, ntyp, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp);
-}
-
-void get_fp_periodic_long(int lmax, int nat, int ntyp, int types[], double lat[3][3],
-        double rxyz[][3], int znucl[], int natx, double cutoff, double **lfp)
-{
-    int i, ixyz, flag = -1;
-    double rcov[nat], **sfp = NULL;
-    int lseg, l;
-
-    if (lmax == 0){
-        lseg = 1;
-        l = 1;
-    }else if (lmax == 1){
-        lseg = 4;
-        l = 2;
-    }else {
-        fprintf(stderr, "Error: ORBITAL.");
-        exit(1);
-    }
-
-    for (i = 0; i < nat; i++)
-        rcov[i] = get_rcov( znucl[ types[i] - 1 ] );
-
-    ixyz = get_ixyz(lat, cutoff);
-
-    /* flag < 0: long fp only;  == 0: short fp only; > 0: long and short fp */
-    get_fp(flag, nat, ntyp, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp);
 }
 
 double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
@@ -204,7 +173,7 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
                         tt = 0.0;
                         for (k = 0; k < fp_len; k++)
                             tt += (fp1[iat][k] - fp2[jat][k]) * (fp1[iat][k] - fp2[jat][k]);
-                        costmp[i-1][j-1] = sqrt(tt);
+                        costmp[i-1][j-1] = sqrt(tt/fp_len);
                     }
                 }
             }
@@ -230,7 +199,7 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
         fpd += cc;
 
     }
-    fpd /= sqrt(nat);
+    fpd /= nat;
 
     return fpd;
 }

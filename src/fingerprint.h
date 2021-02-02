@@ -27,14 +27,15 @@
 #define NC  3 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
-
-extern void dsyev( char* jobz, char* uplo, int* n, double* a, int* lda,
+/*
+void dsyev( char* jobz, char* uplo, int* n, double* a, int* lda,
         double* w, double* work, int* lwork, int* info );
 
-extern void dsygv(int* itype, char* jobz, char* uplo, int* n, double* a, 
+void dsygv(int* itype, char* jobz, char* uplo, int* n, double* a, 
         int* lda, double* b, int* ldb, double* w, double* work, int* lwork, int* info);
+*/
 
-void get_fp(int flag, int nat, int ntyp, int ixyz, int nx, int lseg, int l, double lat[3][3],
+void get_fp(int flag, int log, int nat, int ntyp, int ixyz, int nx, int lseg, int l, double lat[3][3],
         double rxyz[][3], int types[], double rcov[], double cutoff, double **lfp, double **sfp);
 
 

@@ -173,13 +173,15 @@ static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args)
 {
     int i, j, ntyp;
     double fpdist;
-    PyArrayObject* tfp1;
-    PyArrayObject* tfp2;
-    PyArrayObject* atom_type;
+    PyArrayObject* py_fp1;
+    PyArrayObject* py_fp2;
+    PyArrayObject* py_atom_type;
     PyObject* array;
     PyObject* farray;
+    int nat, fp_len;
+    int* types;
 
-    if (!PyArg_ParseTuple(args, "iOOO", &ntyp, &atom_type, &tfp1, &tfp2))
+    if (!PyArg_ParseTuple(args, "iOOO", &ntyp, &py_atom_type, &py_fp1, &py_fp2))
         return NULL;
 
     // double (*
@@ -190,7 +192,7 @@ static PyObject * get_fppy_dist_periodic(PyObject *self, PyObject *args)
     for ( i = 0; i < nat; i++) {
         types[i] = (int)typeslong[i];
     }
-
+    
 
     double (*fptt1)[fp_len] = (double(*)[fp_len])tfp1->data;
     double (*fptt2)[fp_len] = (double(*)[fp_len])tfp2->data;

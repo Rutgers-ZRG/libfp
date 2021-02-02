@@ -2,7 +2,7 @@
  * Copyright (C) 2015 Li Zhu 
  * All rights reserved. 
  * 
- * fplib.h
+ * fplibf.c
  * This file is part of fplib.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,16 +23,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  * ****************************************************************************/
-
-int get_major_version(void);
-int get_minor_version(void);
-int get_micro_version(void);
-
-void get_fp_nonperiodic(int nid, int nat, int ntyp, int types[], double rxyz[][3], int znucl[], double fp[]);
-
-void get_fp_periodic(int flag, int log, int lmax, int nat, int ntyp, int types[], double lat[3][3],
-        double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp, double **lfp);
-
-double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len, 
-        double **fp1, double **fp2, int f[]);
-
