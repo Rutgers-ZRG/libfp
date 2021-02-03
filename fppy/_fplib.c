@@ -127,6 +127,7 @@ static PyObject * py_get_nonperiodic(PyObject *self, PyObject *args)
     PyArrayObject* py_znu;
     PyObject* vec;
     int nat, ntyp;
+    PyObject* pytmp;
 
 
     if (!PyArg_ParseTuple(args, "OOO", &py_positions, &py_atom_type, &py_znu))
@@ -152,7 +153,9 @@ static PyObject * py_get_nonperiodic(PyObject *self, PyObject *args)
     get_fp_nonperiodic(nid, nat, ntyp, types, rxyz, znuc, fp);
     vec = PyList_New(0);
     for (i = 0; i < nid; i++) {
-        PyList_Append(vec, PyFloat_FromDouble( fp[i] ));
+        pytmp = PyFloat_FromDouble( fp[i] );
+        PyList_Append(vec, pytmp);
+        Py_DECREF(pytmp);
     }
     free(fp);
 
@@ -170,6 +173,7 @@ static PyObject * py_get_periodic(PyObject *self, PyObject *args)
     PyArrayObject* py_atom_type;
     PyArrayObject* py_znu;
     PyObject* array, *vec, *shortfp, *longfp;
+    PyObject* pytmp;
 
 
     if (!PyArg_ParseTuple(args, "iiOOOOiid", &flag, &log, &py_lattice, &py_positions, &py_atom_type, &py_znu,
@@ -212,6 +216,7 @@ static PyObject * py_get_periodic(PyObject *self, PyObject *args)
         lfp[i] = (double *) malloc(sizeof(double) * (natx * lseg));
     }
 
+
     get_fp_periodic(flag, log, lmax, nat, ntyp, types, lat, rxyz, znuc, natx,  cutoff, sfp, lfp);
 
 
@@ -221,14 +226,18 @@ static PyObject * py_get_periodic(PyObject *self, PyObject *args)
         if (flag > 0) {
             vec = PyList_New(0);
             for ( j = 0; j < l*(ntyp+1); j++){
-                PyList_Append(vec, PyFloat_FromDouble( sfp[i][j] ) );
+                pytmp = PyFloat_FromDouble( sfp[i][j] );
+                PyList_Append(vec,  pytmp);
+                Py_DECREF(pytmp);
             }
             PyList_Append( shortfp, vec );
             Py_DECREF(vec);
         }
         vec = PyList_New(0);
         for (j = 0; j < natx*lseg; j++) {
-            PyList_Append(vec, PyFloat_FromDouble( lfp[i][j] ) );
+            pytmp = PyFloat_FromDouble( lfp[i][j] );
+            PyList_Append(vec, pytmp );
+            Py_DECREF(pytmp);
         }
         PyList_Append( longfp, vec);
         Py_DECREF(vec);
@@ -237,6 +246,8 @@ static PyObject * py_get_periodic(PyObject *self, PyObject *args)
     array = PyList_New(0);
     PyList_Append( array, shortfp );
     PyList_Append( array, longfp );
+    Py_DECREF(shortfp);
+    Py_DECREF(longfp);
 
     for (i = 0; i < nat; i++) {
         free(sfp[i]);
@@ -264,6 +275,7 @@ static PyObject * py_get_dist_periodic(PyObject *self, PyObject *args)
     PyObject* array;
     PyObject* farray;
     int nat, fp_len;
+    PyObject* pytmp;
 
     if (!PyArg_ParseTuple(args, "iOOO", &ntyp, &py_atom_type, &py_fp1, &py_fp2))
         return NULL;
@@ -316,7 +328,9 @@ static PyObject * py_get_dist_periodic(PyObject *self, PyObject *args)
 
     farray = PyList_New(0);
     for (i = 0; i < nat; i++){
-        PyList_Append(farray, PyLong_FromLong( (long)f[i] ));
+        pytmp = PyLong_FromLong( (long)f[i] );
+        PyList_Append(farray, pytmp);
+        Py_DECREF(pytmp);
     }
 
     array = PyList_New(0);
