@@ -62,6 +62,8 @@ void get_fp(int flag, int log, int nat, int ntyp, int ixyz, int nx, int lseg, in
     wc = cutoff / sqrt(2.0 * NC);
     fc = 1.0 / (2.0 * NC * wc * wc);
 
+
+
     for (iat = 0; iat < nat; iat++) {
         xi = rxyz[iat][0];
         yi = rxyz[iat][1];
@@ -152,6 +154,7 @@ void get_fp(int flag, int log, int nat, int ntyp, int ixyz, int nx, int lseg, in
 
         dsyev_("V", "U", &nid, a, &lda, w, &wkopt, &lwork, &info);
         lwork = (int)wkopt;
+
         work = (double*) malloc(lwork*sizeof(double));
         dsyev_("V", "U", &nid, a, &lda, w, work, &lwork, &info);
         if (info > 0 ) {

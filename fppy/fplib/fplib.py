@@ -101,5 +101,7 @@ def _expand_cell(cell):
     rxyz = np.array(cell[1], float)
     types = np.array(cell[2], int)
     znucl = np.array(cell[3], int)
+    if len(rxyz) != len(types) or len(set(types)) != len(znucl):
+        raise ValueError('Something wrong with rxyz / types / znucl.')
     return lat, rxyz, types, znucl
 

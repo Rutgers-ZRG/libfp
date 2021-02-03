@@ -143,7 +143,9 @@ void get_fp_periodic(int flag, int log, int lmax, int nat, int ntyp, int types[]
     }
 
     for (i = 0; i < nat; i++)
+    {
         rcov[i] = get_rcov( znucl[ types[i] - 1 ] );
+    }
 
     ixyz = get_ixyz(lat, cutoff);
 

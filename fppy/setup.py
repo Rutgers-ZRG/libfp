@@ -28,8 +28,7 @@ except ImportError:
     try:
         from numpy.distutils.misc_util import get_numpy_include_dirs
     except ImportError:
-        print("numpy.distutils.misc_util cannot be imported. Please install "
-              "numpy first before installing spglib...")
+        print("Please install numpy first before installing fplib...")
         sys.exit(1)
 
 # Workaround Python issue 21121
@@ -57,8 +56,6 @@ for i, s in enumerate(sources):
     sources[i] = "%s/%s" % (source_dir, s)
 
 extra_compile_args = []
-if setup_type == 'test':
-    extra_compile_args.append("-UNDEBUG")
 extra_link_args = []
 define_macros = []
 
@@ -114,7 +111,7 @@ if use_setuptools:
           platforms=['all'],
           ext_modules=[extension])
 else:
-    setup(name='spglib',
+    setup(name='fplib',
           version=version,
           license='MIT',
           description='This is the fplib module.',
