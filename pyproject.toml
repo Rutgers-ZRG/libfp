@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "numpy"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fplib"
+version = "3.1.1"  
+description = "This is the fplib module."
+authors = [
+    {name = "Li Zhu", email = "z@zhuli.name"},
+]
+license = {text = "MIT"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+urls = {Homepage = "https://github.com/Rutgers-ZRG/fplib"}
+dependencies = [
+    "numpy",
+]
+
+[tool.setuptools.packages.find]
+where = ["fppy"]
+include = ["fplib"]
+
+[tool.setuptools.package-data]
+fplib = ["*.pyd", "*.so"]
