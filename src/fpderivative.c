@@ -1,8 +1,8 @@
 /*******************************************************************************
- * Copyright (C) 2015 Li Zhu 
- * All rights reserved. 
- * 
- * fplib.h
+ * Copyright (C) 2021 Zhu Research Group @ Rutgers-Newark
+ * All rights reserved.
+ *
+ * pyfp.c
  * This file is part of fplib.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -11,10 +11,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,13 @@
  * THE SOFTWARE.
  * ****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include "fplib.h"
+#include "rcov.h"
+#include "fingerprint.h"
+#include "apc.h"
+#include "version.h"
 
-#define FPLIB_MAJOR_VERSION 3
-#define FPLIB_MINOR_VERSION 1
-#define FPLIB_MICRO_VERSION 1
