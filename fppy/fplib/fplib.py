@@ -51,7 +51,7 @@ def get_lfp(cell,
         print ('Warning: wrong type of orbital')
         lmax = 0
 
-    (sfp, lfp) = fp.fp_periodic(0, wlog, lat, rxyz, types, znucl, lmax, natx, cutoff)
+    (sfp, lfp) = fp.fp_periodic(0, 0, wlog, lat, rxyz, types, znucl, lmax, natx, cutoff)
     return np.array(lfp)
 
 
@@ -76,8 +76,32 @@ def get_sfp(cell,
         print ('Warning: wrong type of orbital')
         lmax = 0
 
-    (sfp, lfp) = fp.fp_periodic(1, wlog, lat, rxyz, types, znucl, lmax, natx, cutoff)
+    (sfp, lfp) = fp.fp_periodic(1, 0, wlog, lat, rxyz, types, znucl, lmax, natx, cutoff)
     return np.array(sfp)
+
+def get_dfp(cell,
+            cutoff=4.0,
+            log=True,
+            orbital='s',
+            natx=300):
+    '''
+    cell : tuple (lattice, rxyz, types, znucl)
+    '''
+    (lat, rxyz, types, znucl) = _expand_cell(cell)
+    if log is True:
+        wlog = 1
+    else:
+        wlog = 0
+    if orbital == 's':
+        lmax = 0
+    elif orbital == 'sp':
+        lmax = 1
+    else:
+        print ('Warning: wrong type of orbital')
+        lmax = 0
+
+    (sfp, lfp, dfp) = fp.fp_periodic(0, 1, wlog, lat, rxyz, types, znucl, lmax, natx, cutoff)
+    return np.array(lfp), np.array(dfp)
 
 
 def get_fp_dist(lfp1, lfp2, types, assignment=False):

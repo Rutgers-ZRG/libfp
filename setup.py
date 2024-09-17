@@ -23,7 +23,7 @@ include_dirs = [source_dir, ]
 sources = [f"{source_dir}/{s}" for s in sources]
 
 lapack_dir = []
-lapack_lib = ['openblas']
+lapack_lib = ['lapack']
 extra_link_args = []
 
 extension = Extension('fplib._fplib',

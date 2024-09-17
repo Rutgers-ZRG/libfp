@@ -165,18 +165,18 @@ static PyObject * py_get_nonperiodic(PyObject *self, PyObject *args)
 
 static PyObject * py_get_periodic(PyObject *self, PyObject *args)
 {
-    int i, j, lmax, l, lseg, natx, flag, log;
+    int i, j, k, lmax, l, lseg, natx, flag, log, ldfp;
     double cutoff;
-    double **sfp, **lfp;
+    double **sfp, **lfp, ****dfp;
     PyArrayObject* py_lattice;
     PyArrayObject* py_positions;
     PyArrayObject* py_atom_type;
     PyArrayObject* py_znu;
-    PyObject* array, *vec, *shortfp, *longfp;
+    PyObject* array, *vec, *vec1, *vec2, *shortfp, *longfp, ***outdfp;
     PyObject* pytmp;
 
 
-    if (!PyArg_ParseTuple(args, "iiOOOOiid", &flag, &log, &py_lattice, &py_positions, &py_atom_type, &py_znu,
+    if (!PyArg_ParseTuple(args, "iiiOOOOiid", &flag, &ldfp, &log, &py_lattice, &py_positions, &py_atom_type, &py_znu,
                 &lmax, &natx,  &cutoff))
         return NULL;
 
@@ -216,9 +216,47 @@ static PyObject * py_get_periodic(PyObject *self, PyObject *args)
         lfp[i] = (double *) malloc(sizeof(double) * (natx * lseg));
     }
 
+    // dfp = (double ****) malloc(sizeof(double ***) * nat);
+    // for ( i = 0; i < nat; i++ ) {
+    //     dfp[i] = (double ***) malloc(sizeof(double **) * nat);
+    //     for ( j = 0; j < nat; j++ ) {
+    //         dfp[i][j] = (double **) malloc(sizeof(double *) * 3);
+    //         for ( k = 0; k < 3; k++ ) {
+    //             dfp[i][j][k] = (double *) malloc(sizeof(double) * (natx * lseg));
+    //         }
+    //     }
+    // }
+    // Assuming n_sphere is defined and represents the number of orbitals
+dfp = (double ****) malloc(sizeof(double ***) * nat);
+if (dfp == NULL) {
+    fprintf(stderr, "Failed to allocate dfp\n");
+    exit(EXIT_FAILURE);
+}
+for (i = 0; i < nat; i++) {
+    dfp[i] = (double ***) malloc(sizeof(double **) * nat);
+    if (dfp[i] == NULL) {
+        fprintf(stderr, "Failed to allocate dfp[%d]\n", i);
+        exit(EXIT_FAILURE);
+    }
+    for (j = 0; j < nat; j++) {
+        dfp[i][j] = (double **) malloc(sizeof(double *) * 3);
+        if (dfp[i][j] == NULL) {
+            fprintf(stderr, "Failed to allocate dfp[%d][%d]\n", i, j);
+            exit(EXIT_FAILURE);
+        }
+        for (k = 0; k < 3; k++) {
+            dfp[i][j][k] = (double *) calloc(natx, sizeof(double));
+            if (dfp[i][j][k] == NULL) {
+                fprintf(stderr, "Failed to allocate dfp[%d][%d][%d]\n", i, j, k);
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+}
 
-    get_fp_periodic(flag, log, lmax, nat, ntyp, types, lat, rxyz, znuc, natx,  cutoff, sfp, lfp);
-
+    //printf("get_fp_periodic AAA\n");
+    get_fp_periodic(flag, ldfp, log, lmax, nat, ntyp, types, lat, rxyz, znuc, natx,  cutoff, sfp, lfp, dfp);
+    //printf("get_fp_periodic BBB\n");
 
     shortfp = PyList_New(0);
     longfp = PyList_New(0);
@@ -243,9 +281,38 @@ static PyObject * py_get_periodic(PyObject *self, PyObject *args)
         Py_DECREF(vec);
     }
 
+    if (ldfp > 0) {
+        outdfp = PyList_New(0);
+        for ( i = 0; i < nat; i++ ) {
+            vec = PyList_New(0);
+            for ( j = 0; j < nat; j++ ) {
+                vec1 = PyList_New(0);
+                for ( k = 0; k < 3; k++ ) {
+                    vec2 = PyList_New(0);
+                    for ( l = 0; l < natx*lseg; l++ ) {
+                        pytmp = PyFloat_FromDouble( dfp[i][j][k][l] );
+                        PyList_Append(vec2, pytmp );
+                        Py_DECREF(pytmp);
+                    }
+                    PyList_Append(vec1, vec2);
+                    Py_DECREF(vec2);
+                }
+                PyList_Append(vec, vec1);
+                Py_DECREF(vec1);
+
+            }
+            PyList_Append( outdfp, vec );
+            Py_DECREF(vec);
+        }
+    }
+
     array = PyList_New(0);
     PyList_Append( array, shortfp );
     PyList_Append( array, longfp );
+    if (ldfp > 0) {
+        PyList_Append( array, outdfp );
+        Py_DECREF(outdfp);
+    }
     Py_DECREF(shortfp);
     Py_DECREF(longfp);
 
@@ -259,6 +326,20 @@ static PyObject * py_get_periodic(PyObject *self, PyObject *args)
     free(lfp);
     sfp = NULL;
     lfp = NULL;
+
+    // free dfp
+    for (i = 0; i < nat; i++) {
+        for (j = 0; j < nat; j++) {
+            for (k = 0; k < 3; k++) {
+                free(dfp[i][j][k]);
+                dfp[i][j][k] = NULL;
+            }
+            free(dfp[i][j]);
+            dfp[i][j] = NULL;
+        }
+        free(dfp[i]);
+        dfp[i] = NULL;
+    }
 
     return array;
 
