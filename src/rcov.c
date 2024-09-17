@@ -144,5 +144,6 @@ double get_rcov(int z) {
     else if ( z == 112)  rcov = 1.22;   /* "Cn"  */
     else rcov = 1.0;
 
-    return rcov /  0.52917720859;
+    //return rcov /  0.52917720859;
+    return rcov;
 }

@@ -91,7 +91,7 @@ void get_fp_nonperiodic(int nid, int nat, int ntyp, int types[], double rxyz[][3
                 exit(1);
             }
         }
-    creat_om(4, nat, rxyz, rcov, amp, om);
+    creat_om(4, nat, rxyz, rcov, om);
 
     for (i = 0; i < nid; i++)
         for (j = 0; j< nid; j++)
@@ -124,8 +124,8 @@ void get_fp_nonperiodic(int nid, int nat, int ntyp, int types[], double rxyz[][3
 
 
 
-void get_fp_periodic(int flag, int log, int lmax, int nat, int ntyp, int types[], double lat[3][3],
-        double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp, double **lfp)
+void get_fp_periodic(int flag, int ldfp, int log, int lmax, int nat, int ntyp, int types[], double lat[3][3],
+        double rxyz[][3], int znucl[], int natx, double cutoff, double **sfp, double **lfp, double ****dfp)
 {
     int i, ixyz;
     double rcov[nat];
@@ -150,7 +150,7 @@ void get_fp_periodic(int flag, int log, int lmax, int nat, int ntyp, int types[]
     ixyz = get_ixyz(lat, cutoff);
 
     /* flag = 0: long fp only;  = 1: long and short fp */
-    get_fp(flag, log, nat, ntyp, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp);
+    get_fp(flag, ldfp, log, nat, ntyp, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp, dfp);
 
 }
 
