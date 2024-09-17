@@ -17,7 +17,7 @@ To install python-fplib using `setup.py`, python header files (python-dev), C-co
 
 2. Type the command:
 
-   `% python setup.py install --user`
+   `% pip install .
 
    
 
