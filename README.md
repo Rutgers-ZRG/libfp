@@ -1,27 +1,51 @@
-# Fplib
-Fplib is is a library for calculating fingerprint and measuring similarites of materials (e.g. crystals, clusters, and molecules). The library is written in C, with python interface. 
+# fplib
 
-The detailed algorithm of fplib is describted the following paper:
-
-- "[A fingerprint based metric for measuring similarities of crystaline structures](http://scitation.aip.org/content/aip/journal/jcp/144/3/10.1063/1.4940026)",
-  Li Zhu, Maximilian Amsler, Tobias Fuhrer, Bastian Schaefer, Somayeh Fareji, Alireza Ghasemi, Migle Grauzinyte, Chris Wolverton, and Stefan Goedecker
-  **J. Chem. Phys. 144**, 034203 (2016)
+Fplib is a library for calculating fingerprints and measuring similarities of materials (e.g., crystals, clusters, and molecules). The library is written in C with a Python interface.
 
 
+## Installation
 
-# Installation
+### Prerequisites
 
-To install python-fplib using `setup.py`, python header files (python-dev), C-compiler (e.g., gcc, clang), numpy, and lapack (openblas, atlas, Intel-MKL) are required before the build. The installation steps are shown as follows:
+Before installing python-fplib, ensure you have the following:
 
-1. Go to the fppy directory
+- Python header files (python-dev)
+- C compiler (e.g., gcc, clang)
+- NumPy
+- OpenBLAS
 
-2. Type the command:
+### Installation Steps
 
-   `% pip install .
+1. Clone the repository:
+   ```
+   git clone https://github.com/Rutgers-ZRG/fplib.git
+   cd fplib
+   ```
 
-   
+2. Install using pip:
+   ```
+   pip install .
+   ```
 
-# Example
+## Usage
 
+To use fplib in your Python project:
+
+```python
+import fplib
+
+# Your code here
+```
+
+## Examples
+
+Example
 Examples are found in `examples` directory.
 
+## Algorithm
+
+The detailed algorithm of fplib is described in the following paper:
+
+- "[A fingerprint based metric for measuring similarities of crystalline structures](http://scitation.aip.org/content/aip/journal/jcp/144/3/10.1063/1.4940026)",
+  Li Zhu, Maximilian Amsler, Tobias Fuhrer, Bastian Schaefer, Somayeh Fareji, Alireza Ghasemi, Migle Grauzinyte, Chris Wolverton, and Stefan Goedecker
+  **J. Chem. Phys. 144**, 034203 (2016)
