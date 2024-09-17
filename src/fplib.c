@@ -153,7 +153,7 @@ void get_fp_periodic(int flag, int ldfp, int log, int lmax, int nat, int ntyp, i
     get_fp(flag, ldfp, log, nat, ntyp, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp, dfp);
 
 }
-
+/*
 double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
         double **fp1, double **fp2, int f[])
 {
@@ -205,4 +205,134 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
 
     return fpd;
 }
+*/
+double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
+        double **fp1, double **fp2, int f[])
+{
+    if (nat <= 0 || fp_len <= 0) {
+        // Handle invalid input
+        return -1.0;
+    }
 
+    double fpd = 0.0, cc = 0.0, tt = 0.0, **costmp = NULL, *a = NULL;
+    int iat, jat, ityp, i, j, k, ii, jj, inat = 0, *ft = NULL;
+
+    // Allocate costmp
+    costmp = (double **)malloc(nat * sizeof(double *));
+    if (!costmp) {
+        // Handle allocation failure
+        return -1.0;
+    }
+    for (i = 0; i < nat; i++) {
+        costmp[i] = (double *)malloc(nat * sizeof(double));
+        if (!costmp[i]) {
+            // Handle allocation failure
+            for (j = 0; j < i; j++) free(costmp[j]);
+            free(costmp);
+            return -1.0;
+        }
+    }
+   
+    for (ityp = 1; ityp <= ntyp; ityp++) {
+        i = 0;
+
+        // Count number of atoms of type 'ityp'
+        for (iat = 0; iat < nat; iat++) {
+            if (types[iat] == ityp) {
+                i++;
+            }
+        }
+
+        if (i == 0) {
+            continue; // No atoms of this type
+        }
+
+        // Allocate ft and a
+        ft = (int *)malloc(sizeof(int) * i);
+        if (!ft) {
+            // Handle allocation failure
+            // Free costmp
+            for (j = 0; j < nat; j++) free(costmp[j]);
+            free(costmp);
+            return -1.0;
+        }
+        a = (double *)malloc(sizeof(double) * i * i);
+        if (!a) {
+            // Handle allocation failure
+            free(ft);
+            for (j = 0; j < nat; j++) free(costmp[j]);
+            free(costmp);
+            return -1.0;
+        }
+        
+        int idx_i = 0;
+        for (iat = 0; iat < nat; iat++) {
+            if (types[iat] == ityp) {
+                int idx_j = 0;
+                for (jat = 0; jat < nat; jat++) {
+                    if (types[jat] == ityp) {
+                        tt = 0.0;
+                        for (k = 0; k < fp_len; k++) {
+                            double diff = fp1[iat][k] - fp2[jat][k];
+                            tt += diff * diff;
+                        }
+                        costmp[idx_i][idx_j] = sqrt(tt / fp_len);
+                        idx_j++;
+                    }
+                }
+                idx_i++;
+            }
+        }
+        
+        // Copy costmp into a
+        for (ii = 0; ii < i; ii++) {
+            for (jj = 0; jj < i; jj++) {
+                a[ii * i + jj] = costmp[ii][jj];
+            }
+        }
+
+        // Call apc function
+        
+        int apc_status = apc(i, a, &cc, ft);
+        
+        if (apc_status != 0) {
+            // Handle error
+            free(ft);
+            free(a);
+            for (j = 0; j < nat; j++) free(costmp[j]);
+            free(costmp);
+            return -1.0;
+        }
+
+        // Update f and inat
+        for (k = 0; k < i; k++) {
+            if (inat >= nat) {
+                // Prevent buffer overflow
+                break;
+            }
+            f[inat] = ft[k];
+            inat++;
+        }
+
+        free(ft);
+        free(a);
+        ft = NULL;
+        a = NULL;
+        fpd += cc;
+    }
+
+    if (nat == 0) {
+        // Prevent division by zero
+        for (i = 0; i < nat; i++) free(costmp[i]);
+        free(costmp);
+        return -1.0;
+    }
+
+    fpd /= nat;
+
+    // Free costmp
+    for (i = 0; i < nat; i++) free(costmp[i]);
+    free(costmp);
+
+    return fpd;
+}

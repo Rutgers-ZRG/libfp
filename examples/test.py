@@ -33,7 +33,9 @@ def cal_dist():
     cell2 = (lat2, rxyz2, types2, znucl)
     # the default value for orbital is 's'
     fp1 = fplib.get_lfp(cell1, cutoff=5, log=True, orbital='sp')
+    # print (fp1)
     fp2 = fplib.get_lfp(cell2, cutoff=5, log=True, orbital='sp')
+    # print (fp2)
 
     dist = fplib.get_fp_dist(fp1, fp2, types1)
 
@@ -50,7 +52,7 @@ def get_fp_derivative():
     print ("Fingerprint")
     print (fp)
     print ("Fingerprint derivative")
-    print (dfp)
+    print (len(dfp))
 
 
 if __name__ == "__main__":

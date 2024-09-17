@@ -112,6 +112,7 @@ def get_fp_dist(lfp1, lfp2, types, assignment=False):
     else:
         return dist
 
+
 def get_nfp(rxyz, types, znucl):
     nfp = fp.fp_nonperiodic(rxyz, types, znucl)
     return np.array(nfp)

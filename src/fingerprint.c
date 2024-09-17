@@ -355,20 +355,20 @@ void get_fp(int flag, int ldfp, int log, int nat, int ntyp, int ixyz, int nx, in
             free(tmpA);
             free(matt);
                
-        //free dom
-        for (i = 0; i < nid; i++)
-        {
-            for (j = 0; j < 3; j++)
+            //free dom
+            for (i = 0; i < nid; i++)
             {
-                for (k=0; k<nid; k++)
+                for (j = 0; j < 3; j++)
                 {
-                    free(dom[i][j][k]);
+                    for (k=0; k<nid; k++)
+                    {
+                        free(dom[i][j][k]);
+                    }
+                    free(dom[i][j]);
                 }
-                free(dom[i][j]);
+                free(dom[i]);
             }
-            free(dom[i]);
-        }
-        free(dom);
+            free(dom);
 
         }
 

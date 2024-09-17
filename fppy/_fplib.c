@@ -93,7 +93,7 @@ PyInit__fplib(void)
 
   st = GETSTATE(module);
 
-  st->error = PyErr_NewException("_spglib.Error", NULL, NULL);
+  st->error = PyErr_NewException("_fplib.Error", NULL, NULL);
   if (st->error == NULL) {
     Py_DECREF(module);
     INITERROR;
@@ -208,14 +208,29 @@ static PyObject * py_get_periodic(PyObject *self, PyObject *args)
     }
 
    
-    sfp = (double **) malloc(sizeof(double)*nat);
-    lfp = (double **) malloc(sizeof(double)*nat);
+    sfp = (double **) malloc(sizeof(double*)*nat);
+    if (!sfp) {
+        // Handle allocation failure
+        PyErr_SetString(PyExc_MemoryError, "Failed to allocate memory for sfp");
+        return NULL;
+    }
+    lfp = (double **) malloc(sizeof(double*)*nat);
+    if (!lfp) {
+        // Handle allocation failure
+        PyErr_SetString(PyExc_MemoryError, "Failed to allocate memory for lfp");
+        return NULL;
+    }
 
     for ( i = 0; i < nat; i++ ) {
         sfp[i] = (double *) malloc(sizeof(double) * l * (ntyp + 1));
         lfp[i] = (double *) malloc(sizeof(double) * (natx * lseg));
     }
 
+    // Zero-initialization
+    for (i = 0; i < nat; i++) {
+        memset(sfp[i], 0, sizeof(double) * l * (ntyp + 1));
+        memset(lfp[i], 0, sizeof(double) * natx * lseg);
+    }
     // dfp = (double ****) malloc(sizeof(double ***) * nat);
     // for ( i = 0; i < nat; i++ ) {
     //     dfp[i] = (double ***) malloc(sizeof(double **) * nat);
@@ -227,36 +242,36 @@ static PyObject * py_get_periodic(PyObject *self, PyObject *args)
     //     }
     // }
     // Assuming n_sphere is defined and represents the number of orbitals
-dfp = (double ****) malloc(sizeof(double ***) * nat);
-if (dfp == NULL) {
-    fprintf(stderr, "Failed to allocate dfp\n");
-    exit(EXIT_FAILURE);
-}
-for (i = 0; i < nat; i++) {
-    dfp[i] = (double ***) malloc(sizeof(double **) * nat);
-    if (dfp[i] == NULL) {
-        fprintf(stderr, "Failed to allocate dfp[%d]\n", i);
+    dfp = (double ****) malloc(sizeof(double ***) * nat);
+    if (dfp == NULL) {
+        fprintf(stderr, "Failed to allocate dfp\n");
         exit(EXIT_FAILURE);
     }
-    for (j = 0; j < nat; j++) {
-        dfp[i][j] = (double **) malloc(sizeof(double *) * 3);
-        if (dfp[i][j] == NULL) {
-            fprintf(stderr, "Failed to allocate dfp[%d][%d]\n", i, j);
+    for (i = 0; i < nat; i++) {
+        dfp[i] = (double ***) malloc(sizeof(double **) * nat);
+        if (dfp[i] == NULL) {
+            fprintf(stderr, "Failed to allocate dfp[%d]\n", i);
             exit(EXIT_FAILURE);
         }
-        for (k = 0; k < 3; k++) {
-            dfp[i][j][k] = (double *) calloc(natx, sizeof(double));
-            if (dfp[i][j][k] == NULL) {
-                fprintf(stderr, "Failed to allocate dfp[%d][%d][%d]\n", i, j, k);
+        for (j = 0; j < nat; j++) {
+            dfp[i][j] = (double **) malloc(sizeof(double *) * 3);
+            if (dfp[i][j] == NULL) {
+                fprintf(stderr, "Failed to allocate dfp[%d][%d]\n", i, j);
                 exit(EXIT_FAILURE);
+            }
+            for (k = 0; k < 3; k++) {
+                dfp[i][j][k] = (double *) calloc(natx, sizeof(double));
+                if (dfp[i][j][k] == NULL) {
+                    fprintf(stderr, "Failed to allocate dfp[%d][%d][%d]\n", i, j, k);
+                    exit(EXIT_FAILURE);
+                }
             }
         }
     }
-}
 
-    //printf("get_fp_periodic AAA\n");
+    
     get_fp_periodic(flag, ldfp, log, lmax, nat, ntyp, types, lat, rxyz, znuc, natx,  cutoff, sfp, lfp, dfp);
-    //printf("get_fp_periodic BBB\n");
+  
 
     shortfp = PyList_New(0);
     longfp = PyList_New(0);
