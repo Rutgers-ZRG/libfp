@@ -16,6 +16,18 @@ Before installing libfp, ensure you have the following:
 
 ### Installation Steps
 
+You can install libfp using one of the following methods:
+
+#### Option 1: Install from PyPI
+
+To install the latest stable version from PyPI, simply run:
+
+```
+pip install libfp
+```
+
+#### Option 2: Install from source
+
 1. Clone the repository:
    ```
    git clone https://github.com/Rutgers-ZRG/libfp.git
