@@ -29,6 +29,7 @@
 #include <assert.h>
 #include <numpy/arrayobject.h>
 #include <libfp.h>
+//#include "../src/libfp.h"
 
 
 static PyObject * py_get_version(PyObject *self, PyObject *args); 

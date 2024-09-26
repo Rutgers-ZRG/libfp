@@ -7,3 +7,4 @@ examples/test.py
 .DS_Store
 build/*
 fppy/libfp.egg-info/*
+dist/*
