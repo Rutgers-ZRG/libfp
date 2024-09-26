@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fplib"
-version = "3.1.1"  
+version = "3.1.2"  
 description = "This is the fplib module."
 authors = [
-    {name = "Li Zhu", email = "z@zhuli.name"},
+    {name = "Zhu Research Group", email = "li.zhu@rutgers.edu"},
 ]
 license = {text = "MIT"}
 classifiers = [

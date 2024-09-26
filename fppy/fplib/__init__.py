@@ -23,7 +23,7 @@
 # * THE SOFTWARE.
 # * ****************************************************************************/
 
-__version__ = "3.1.1"
+__version__ = "3.1.2"
 
 from .fplib import (get_version,
                      get_lfp,
