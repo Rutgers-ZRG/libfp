@@ -3,9 +3,9 @@ requires = ["setuptools>=45", "wheel", "numpy"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fplib"
+name = "libfp"
 version = "3.1.2"  
-description = "This is the fplib module."
+description = "This is the libfp module."
 authors = [
     {name = "Zhu Research Group", email = "li.zhu@rutgers.edu"},
 ]
@@ -14,14 +14,14 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
 ]
-urls = {Homepage = "https://github.com/Rutgers-ZRG/fplib"}
+urls = {Homepage = "https://github.com/Rutgers-ZRG/libfp"}
 dependencies = [
     "numpy",
 ]
 
 [tool.setuptools.packages.find]
 where = ["fppy"]
-include = ["fplib"]
+include = ["libfp"]
 
 [tool.setuptools.package-data]
-fplib = ["*.pyd", "*.so"]
+libfp = ["*.pyd", "*.so"]

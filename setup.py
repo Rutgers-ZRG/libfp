@@ -27,7 +27,7 @@ if (config_var is not None and
     os.environ['CFLAGS'] = config_var.replace(
         "-Werror=declaration-after-statement", "")
 
-sources = ['fplib.c', 'fingerprint.c', 'rcov.c', 'apc.c']
+sources = ['libfp.c', 'fingerprint.c', 'rcov.c', 'apc.c']
 source_dir = "src" if os.path.exists('src') else "../src"
 include_dirs = [source_dir, numpy.get_include()]
 sources = [f"{source_dir}/{s}" for s in sources]
@@ -48,11 +48,11 @@ if sys.platform == "darwin":
 elif sys.platform.startswith("linux"):
     extra_link_args = ['-Wl,-rpath,/usr/lib', '-Wl,-rpath,/usr/local/lib']
 
-extension = Extension('fplib._fplib',
+extension = Extension('libfp._libfp',
                       include_dirs=include_dirs,
                       library_dirs=lapack_dir,
                       libraries=lapack_lib,
-                      sources=['fppy/_fplib.c'] + sources,
+                      sources=['fppy/_libfp.c'] + sources,
                       extra_compile_args=[],
                       extra_link_args=extra_link_args,
                       define_macros=[])

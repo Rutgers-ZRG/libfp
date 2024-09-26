@@ -2,7 +2,7 @@
 # * Copyright (C) 2021 Zhu Research Group @ Rutgers-Newark
 # * All rights reserved.
 # *
-# * This file is part of fplib.
+# * This file is part of libfp.
 # *
 # * Permission is hereby granted, free of charge, to any person obtaining a copy
 # * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 # * THE SOFTWARE.
 # * ****************************************************************************/
 
-from . import _fplib as fp
+from . import _libfp as fp
 import numpy as np
 
 def get_version():

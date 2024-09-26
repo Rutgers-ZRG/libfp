@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * apc.c
- * This file is part of fplib.
+ * This file is part of libfp.
  *
  * SOLUTION OF THE LINEAR MIN-SUM ASSIGNMENT PROBLEM.
  * HUNGARIAN METHOD. COMPLEXITY O(n^3).

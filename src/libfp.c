@@ -2,8 +2,8 @@
  * Copyright (C) 2015 Li Zhu
  * All rights reserved.
  *
- * fplib.c
- * This file is part of fplib.
+ * libfp.c
+ * This file is part of libfp.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "fplib.h"
+#include "libfp.h"
 #include "rcov.h"
 #include "fingerprint.h"
 #include "apc.h"
@@ -39,7 +39,7 @@ extern void dsyev_( char* jobz, char* uplo, int* n, double* a, int* lda,
                         double* w, double* work, int* lwork, int* info );
 
 /*-----------------------------------------*/
-/* Version: fplib-[major].[minor].[micro] */
+/* Version: libfp-[major].[minor].[micro] */
 /*-----------------------------------------*/
 int get_major_version(void)
 {

@@ -1,7 +1,7 @@
 #!/usr/bin/python env python3
 
 import numpy as np
-import fplib 
+import libfp
 
 def readvasp(vp):
     buff = []
@@ -32,12 +32,12 @@ def cal_dist():
     cell1 = (lat1, rxyz1, types1, znucl)
     cell2 = (lat2, rxyz2, types2, znucl)
     # the default value for orbital is 's'
-    fp1 = fplib.get_lfp(cell1, cutoff=5, log=True, orbital='sp')
+    fp1 = libfp.get_lfp(cell1, cutoff=5, log=True, orbital='sp')
     # print (fp1)
-    fp2 = fplib.get_lfp(cell2, cutoff=5, log=True, orbital='sp')
+    fp2 = libfp.get_lfp(cell2, cutoff=5, log=True, orbital='sp')
     # print (fp2)
 
-    dist = fplib.get_fp_dist(fp1, fp2, types1)
+    dist = libfp.get_fp_dist(fp1, fp2, types1)
 
     print ('fingerprint distance between struct1 and struct2: ', dist)
 
@@ -47,7 +47,7 @@ def get_fp_derivative():
     cell = (lat, rxyz, types, znucl)
 
     ##  For the fingerprint derivative, only the S orbit is implemented.
-    fp, dfp = fplib.get_dfp(cell, cutoff=5.0, log=True, natx=200)
+    fp, dfp = libfp.get_dfp(cell, cutoff=5.0, log=True, natx=200)
 
     print ("Fingerprint")
     print (fp)

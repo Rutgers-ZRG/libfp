@@ -25,7 +25,7 @@
 
 __version__ = "3.1.2"
 
-from .fplib import (get_version,
+from .libfp import (get_version,
                      get_lfp,
                      get_sfp,
                      get_nfp,
