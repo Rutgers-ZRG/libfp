@@ -5,3 +5,5 @@ examples/UPOSCAR
 examples/test.py
 *.so
 .DS_Store
+build/*
+fppy/libfp.egg-info/*

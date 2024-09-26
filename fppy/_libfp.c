@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * pyfp.c
- * This file is part of fplib.
+ * This file is part of libfp.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <numpy/arrayobject.h>
-#include <fplib.h>
+#include <libfp.h>
 
 
 static PyObject * py_get_version(PyObject *self, PyObject *args); 
@@ -48,7 +48,7 @@ error_out(PyObject *m) {
   return NULL;
 }
 
-static PyMethodDef _fplib_methods[] = {
+static PyMethodDef _libfp_methods[] = {
     {"version", py_get_version, METH_VARARGS, "Fplib version"},
     {"fp_nonperiodic", py_get_nonperiodic, METH_VARARGS, "get fingerprint non" },
     {"fp_periodic", py_get_periodic, METH_VARARGS, "get fingerprint" },
@@ -58,32 +58,32 @@ static PyMethodDef _fplib_methods[] = {
 
 #define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
 
-static int _fplib_traverse(PyObject *m, visitproc visit, void *arg) {
+static int _libfp_traverse(PyObject *m, visitproc visit, void *arg) {
     Py_VISIT(GETSTATE(m)->error);
     return 0;
 }
 
-static int _fplib_clear(PyObject *m) {
+static int _libfp_clear(PyObject *m) {
     Py_CLEAR(GETSTATE(m)->error);
     return 0;
 }
 
 static struct PyModuleDef moduledef = {
   PyModuleDef_HEAD_INIT,
-  "_fplib",
+  "_libfp",
   NULL,
   sizeof(struct module_state),
-  _fplib_methods,
+  _libfp_methods,
   NULL,
-  _fplib_traverse,
-  _fplib_clear,
+  _libfp_traverse,
+  _libfp_clear,
   NULL
 };
 
 #define INITERROR return NULL
 
 PyObject *
-PyInit__fplib(void)
+PyInit__libfp(void)
 {
   struct module_state *st;
   PyObject *module = PyModule_Create(&moduledef);
@@ -93,7 +93,7 @@ PyInit__fplib(void)
 
   st = GETSTATE(module);
 
-  st->error = PyErr_NewException("_fplib.Error", NULL, NULL);
+  st->error = PyErr_NewException("_libfp.Error", NULL, NULL);
   if (st->error == NULL) {
     Py_DECREF(module);
     INITERROR;
