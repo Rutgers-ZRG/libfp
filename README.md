@@ -4,9 +4,9 @@ libfp is a library for calculating crystalline fingerprints and measuring simila
 
 Research papers where this code has been used include:
 
-- [Accelerating Structural Optimization through Fingerprinting Space Integration on the Potential Energy Surface, J. Phys. Chem. Lett. 15, 3185 (2024)](https://pubs.acs.org/doi/10.1021/acs.jpclett.4c00275)
-- [Quantum structural fluxion in superconducting lanthanum polyhydride, Nature Commun. 14, 1674 (2023)](https://www.nature.com/articles/s41467-023-37295-1)
-- [Phase Transition Pathway Sampling via Swarm Intelligence and Graph Theory, J. Phys. Chem. Lett. 10, 5019 (2019)](https://pubs.acs.org/doi/10.1021/acs.jpclett.9b01715)
+- [Accelerating Structural Optimization through Fingerprinting Space Integration on the Potential Energy Surface, **J. Phys. Chem. Lett. 15**, 3185 (2024)](https://pubs.acs.org/doi/10.1021/acs.jpclett.4c00275)
+- [Quantum structural fluxion in superconducting lanthanum polyhydride, **Nature Commun. 14**, 1674 (2023)](https://www.nature.com/articles/s41467-023-37295-1)
+- [Phase Transition Pathway Sampling via Swarm Intelligence and Graph Theory, **J. Phys. Chem. Lett. 10**, 5019 (2019)](https://pubs.acs.org/doi/10.1021/acs.jpclett.9b01715)
 
 
 
