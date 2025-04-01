@@ -12,11 +12,18 @@ class CustomBuildExtCommand(build_ext):
         build_ext.run(self)
 
 def find_lapack():
+    # Check for Intel MKL first
+    mklroot = os.environ.get('MKLROOT')
+    if mklroot:
+        print(f"Found MKLROOT at {mklroot}")
+        return ['mkl_intel_lp64', 'mkl_sequential', 'mkl_core']
+
+    # Fallback to other LAPACK implementations
     lapack_libs = ['openblas', 'lapack', 'mkl_rt']
     for lib in lapack_libs:
         if find_library(lib):
             return [lib]
-    
+
     print("Warning: No LAPACK library found. Trying to build without explicit LAPACK linkage.")
     return []
 
@@ -37,13 +44,19 @@ lapack_lib = find_lapack()
 
 # Try to find LAPACK library directory
 lapack_dir = []
-if sys.platform == "darwin":
+mklroot = os.environ.get('MKLROOT')
+if mklroot:
+    lapack_dir = [f"{mklroot}/lib/intel64"]
+    include_dirs.append(f"{mklroot}/include")
+elif sys.platform == "darwin":
     lapack_dir = ['/usr/local/opt/openblas/lib', '/usr/local/opt/lapack/lib']
 elif sys.platform.startswith("linux"):
     lapack_dir = ['/usr/lib', '/usr/local/lib']
 
 extra_link_args = []
-if sys.platform == "darwin":
+if mklroot:
+    extra_link_args = [f'-Wl,-rpath,{mklroot}/lib/intel64']
+elif sys.platform == "darwin":
     extra_link_args = ['-Wl,-rpath,/usr/local/opt/openblas/lib', '-Wl,-rpath,/usr/local/opt/lapack/lib']
 elif sys.platform.startswith("linux"):
     extra_link_args = ['-Wl,-rpath,/usr/lib', '-Wl,-rpath,/usr/local/lib']
@@ -67,3 +80,6 @@ setup(
 if not lapack_lib:
     print("No LAPACK library was found. The installation might fail or the library might not work correctly.")
     print("Please ensure you have LAPACK, OpenBLAS, or MKL installed on your system.")
+else:
+    print(f"Using LAPACK libraries: {lapack_lib}")
+    print(f"Library directories: {lapack_dir}")
