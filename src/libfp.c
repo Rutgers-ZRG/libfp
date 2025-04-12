@@ -276,7 +276,7 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
                             double diff = fp1[iat][k] - fp2[jat][k];
                             tt += diff * diff;
                         }
-                        costmp[idx_i][idx_j] = sqrt(tt / fp_len);
+                        costmp[idx_i][idx_j] = sqrt(tt);
                         idx_j++;
                     }
                 }

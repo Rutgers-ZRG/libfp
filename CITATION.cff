@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Zhu"
+    given-names: "Li"
+    orcid: "https://orcid.org/0000-0001-7976-5226"
+    affiliation: "Rutgers University-Newark"
+title: "libfp: A library for calculating crystalline fingerprints and measuring similarities of materials"
+version: 3.1.2
+doi: 10.1063/1.4940026
+date-released: 2016-01-21
+url: "https://github.com/Rutgers-ZRG/libfp"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Zhu"
+      given-names: "Li"
+    - family-names: "Amsler"
+      given-names: "Maximilian"
+    - family-names: "Fuhrer"
+      given-names: "Tobias"
+    - family-names: "Schaefer"
+      given-names: "Bastian"
+    - family-names: "Fareji"
+      given-names: "Somayeh" 
+    - family-names: "Ghasemi"
+      given-names: "Alireza"
+    - family-names: "Grauzinyte"
+      given-names: "Migle"
+    - family-names: "Wolverton"
+      given-names: "Chris"
+    - family-names: "Goedecker"
+      given-names: "Stefan"
+  doi: "10.1063/1.4940026"
+  journal: "The Journal of Chemical Physics"
+  month: 1
+  title: "A fingerprint based metric for measuring similarities of crystalline structures"
+  volume: 144
+  issue: 3
+  year: 2016
+  pages: "034203"
