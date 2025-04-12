@@ -6,7 +6,7 @@ authors:
     orcid: "https://orcid.org/0000-0001-7976-5226"
     affiliation: "Rutgers University-Newark"
 title: "libfp: A library for calculating crystalline fingerprints and measuring similarities of materials"
-version: 3.1.2
+version: 3.1.3
 doi: 10.1063/1.4940026
 date-released: 2016-01-21
 url: "https://github.com/Rutgers-ZRG/libfp"
