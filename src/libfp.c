@@ -153,59 +153,7 @@ void get_fp_periodic(int flag, int ldfp, int log, int lmax, int nat, int ntyp, i
     get_fp(flag, ldfp, log, nat, ntyp, ixyz, natx, lseg, l, lat, rxyz, types, rcov,  cutoff, lfp, sfp, dfp);
 
 }
-/*
-double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
-        double **fp1, double **fp2, int f[])
-{
-    double fpd, cc, tt, costmp[nat][nat], *a;
-    int iat, jat, ityp, i, j, k, ii, jj, inat, *ft;
 
-    fpd = 0.0;
-    inat = 0;
-
-    for (ityp = 1; ityp <= ntyp; ityp++) {
-        i = 0;
-        for (iat = 0; iat < nat; iat++) {
-            if (types[iat] == ityp) {
-                i++;
-                j = 0;
-                for (jat = 0; jat < nat; jat++){
-                    if (types[jat] == ityp) {
-                        j++;
-                        tt = 0.0;
-                        for (k = 0; k < fp_len; k++)
-                            tt += (fp1[iat][k] - fp2[jat][k]) * (fp1[iat][k] - fp2[jat][k]);
-                        costmp[i-1][j-1] = sqrt(tt/fp_len);
-                    }
-                }
-            }
-        }
-        ft = (int *) malloc(sizeof(int)*i);
-        a = (double *) malloc(sizeof(double)*i*i);
-        //printf("nt %d %d\n", i,j);
-
-        for (ii = 0; ii < i; ii++)
-            for (jj = 0; jj < i; jj++)
-                a[ii*i + jj] = costmp[ii][jj];
-        apc(i, a, &cc, ft);
-
-        for (k = 0; k < i; k++){
-            f[inat] = ft[k];
-            inat++;
-        }
-
-        free(ft);
-        free(a);
-        ft = NULL;
-        a = NULL;
-        fpd += cc;
-
-    }
-    fpd /= nat;
-
-    return fpd;
-}
-*/
 double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
         double **fp1, double **fp2, int f[])
 {
@@ -216,6 +164,12 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
 
     double fpd = 0.0, cc = 0.0, tt = 0.0, **costmp = NULL, *a = NULL;
     int iat, jat, ityp, i, j, k, ii, jj, inat = 0, *ft = NULL;
+
+    // Initialize all elements of f array to -1 (invalid index)
+    // so we can identify uninitialized values later
+    for (i = 0; i < nat; i++) {
+        f[i] = -1;
+    }
 
     // Allocate costmp
     costmp = (double **)malloc(nat * sizeof(double *));
@@ -265,9 +219,20 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
             return -1.0;
         }
         
+        // Reset inat for each type - using a mapping table instead
+        int *atom_indices = (int *)malloc(sizeof(int) * i);
+        if (!atom_indices) {
+            free(ft);
+            free(a);
+            for (j = 0; j < nat; j++) free(costmp[j]);
+            free(costmp);
+            return -1.0;
+        }
+        
         int idx_i = 0;
         for (iat = 0; iat < nat; iat++) {
             if (types[iat] == ityp) {
+                atom_indices[idx_i] = iat; // Remember original atom index
                 int idx_j = 0;
                 for (jat = 0; jat < nat; jat++) {
                     if (types[jat] == ityp) {
@@ -292,33 +257,38 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
         }
 
         // Call apc function
-        
         int apc_status = apc(i, a, &cc, ft);
         
         if (apc_status != 0) {
             // Handle error
             free(ft);
             free(a);
+            free(atom_indices);
             for (j = 0; j < nat; j++) free(costmp[j]);
             free(costmp);
             return -1.0;
         }
 
-        // Update f and inat
+        // Update f with correct atom indices
         for (k = 0; k < i; k++) {
-            if (inat >= nat) {
-                // Prevent buffer overflow
-                break;
-            }
-            f[inat] = ft[k];
-            inat++;
+            int orig_atom_idx = atom_indices[k];
+            f[orig_atom_idx] = ft[k];
         }
 
         free(ft);
         free(a);
+        free(atom_indices);
         ft = NULL;
         a = NULL;
         fpd += cc;
+    }
+
+    // Check if any f values are still -1 (uninitialized)
+    // and set them to a default value (0) as fallback
+    for (i = 0; i < nat; i++) {
+        if (f[i] == -1) {
+            f[i] = 0;  // Set to default assignment
+        }
     }
 
     if (nat == 0) {
@@ -333,6 +303,5 @@ double get_fpdistance_periodic(int nat, int ntyp, int types[], int fp_len,
     // Free costmp
     for (i = 0; i < nat; i++) free(costmp[i]);
     free(costmp);
-
     return fpd;
 }
